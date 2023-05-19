@@ -1,18 +1,64 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+  <v-container v-if="user">
+    <v-row>
+      <v-col>
+        <v-card>
+          <v-card-title>Create a new auto archiver sheet</v-card-title>
+          <v-card-text>
+            <p>
+              This tool will configure a Google Sheet on your account for use
+              with Bellingcat's auto archiver. This sheet will be shared with
+              the service account necessary for Bellingcat's archiving server.
+              You can modify and share the Google Sheet subsequently, but do not
+              edit the column names in the header row or remove the service
+              account from the shared users. For more information about the auto
+              archiver and how to use it, see
+              <a href="https://github.com/bellingcat/auto-archiver"
+                >our Github repository</a
+              >
+              and the
+              <a
+                href="https://www.bellingcat.com/resources/2022/09/22/preserve-vital-online-content-with-bellingcats-auto-archiver-tool/"
+                >associated article</a
+              >.
+            </p>
+            <v-text-field
+              label="Document name"
+              v-model="docName"
+            ></v-text-field>
+            <v-btn
+              @click="$store.dispatch('add', { name: docName })"
+              :loading="$store.state.loading"
+              >Add</v-btn
+            >
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <DocList />
+  </v-container>
+  <v-container v-else>
+    <v-alert type="error">Sign in to set up an auto archiver</v-alert>
+  </v-container>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import DocList from "@/components/DocList.vue";
 
 export default {
   name: "HomeView",
   components: {
-    HelloWorld,
+    DocList,
+  },
+  data() {
+    return {
+      docName: "Auto archiver sheet",
+    };
+  },
+  computed: {
+    user() {
+      return this.$store.state.user;
+    },
   },
 };
 </script>
