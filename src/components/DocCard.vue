@@ -23,7 +23,7 @@
         </v-btn>
       </v-col>
       <v-col>
-        <v-btn>Archive now</v-btn>
+        <v-btn @click="$store.dispatch('archive', doc)">Archive now</v-btn>
       </v-col>
       <v-dialog width="500" v-model="dialog" persistent :retain-focus="false">
         <template v-slot:activator="{ on, attrs }">

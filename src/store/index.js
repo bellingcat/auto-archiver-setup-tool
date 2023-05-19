@@ -17,6 +17,7 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
 
@@ -25,6 +26,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: null,
+    access_token: null,
     docs: [],
     loading: false,
   },
@@ -38,11 +40,15 @@ export default new Vuex.Store({
     setLoading(state, loading) {
       state.loading = loading;
     },
+    setAccessToken(state, access_token) {
+      state.access_token = access_token;
+    },
   },
   actions: {
     async signin({ commit, dispatch }) {
       async function callback(tokenResponse) {
         let access_token = tokenResponse.access_token;
+        commit("setAccessToken", access_token);
         const credential = GoogleAuthProvider.credential(null, access_token);
 
         const response = await signInWithCredential(firebaseAuth, credential);
@@ -57,7 +63,8 @@ export default new Vuex.Store({
       const client = google.accounts.oauth2.initTokenClient({
         client_id:
           "406209235111-r1mpkvkfaqc2jg5iqbvffl2b0rf4clbo.apps.googleusercontent.com",
-        scope: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile",
+        scope:
+          "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile",
         callback,
       });
 
@@ -107,6 +114,38 @@ export default new Vuex.Store({
         dispatch("getDocs");
       } catch (error) {
         console.error("removeDocs (firebase.js): ", error);
+      }
+    },
+
+    async archive({ state, dispatch }, sheet) {
+      try {
+        // send a post request to the API with the sheet ID in the body
+        // and a bearer auth token in the header
+        await fetch(
+          "https://auto-archiver-api.bellingcat.com/sheet",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${state.access_token}`,
+            },
+            body: JSON.stringify({
+              sheet_id: sheet.sheetId,
+            }),
+          }
+        );
+
+        // update firestore with the archive status
+        const docRef = doc(firebaseFirestore, "sheets", sheet.id);
+
+        await updateDoc(docRef, {
+          lastArchived: Date.now(),
+        });
+
+        // update the store
+        dispatch("getDocs");
+      } catch (error) {
+        console.error("archive (firebase.js): ", error);
       }
     },
 
@@ -259,7 +298,7 @@ export default new Vuex.Store({
             role: "writer",
             type: "user",
             emailAddress:
-              "test-auto-archiver@bc-auto-archiver.iam.gserviceaccount.com",
+              "m-auto-archiver@bc-auto-archiver.iam.gserviceaccount.com",
           },
         });
 
