@@ -64,7 +64,7 @@ export default new Vuex.Store({
         client_id:
           "406209235111-r1mpkvkfaqc2jg5iqbvffl2b0rf4clbo.apps.googleusercontent.com",
         scope:
-          "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile",
+          "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
         callback,
       });
 
@@ -247,18 +247,18 @@ export default new Vuex.Store({
                           },
                           userEnteredFormat,
                         },
-                        {
-                          userEnteredValue: {
-                            stringValue: "WACZ",
-                          },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Replaywebpage",
-                          },
-                          userEnteredFormat,
-                        },
+                        // {
+                        //   userEnteredValue: {
+                        //     stringValue: "WACZ",
+                        //   },
+                        //   userEnteredFormat,
+                        // },
+                        // {
+                        //   userEnteredValue: {
+                        //     stringValue: "Replaywebpage",
+                        //   },
+                        //   userEnteredFormat,
+                        // },
                       ],
                     },
                   ],
@@ -279,7 +279,7 @@ export default new Vuex.Store({
                       startRowIndex: 0,
                       endRowIndex: 1,
                       startColumnIndex: 0,
-                      endColumnIndex: 13,
+                      endColumnIndex: 11,
                     },
                     description:
                       "Protecting header row (needed for auto-archiver)",

@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@mdi/font": "^7.2.96",
     "core-js": "^3.8.3",
     "firebase": "^9.22.0",
     "firebaseui": "^6.0.2",
