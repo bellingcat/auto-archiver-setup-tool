@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <div class="text-h5 mt-5 mb-3" v-if="docs.length > 0">
       Your auto-archiver documents
     </div>
@@ -8,7 +8,7 @@
         <DocCard :doc="doc" />
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script>
