@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBN5oJ8c_VGhcfesAxXPVmuVnJ_V5MM8JM",
-  authDomain: "osm-search-364115.firebaseapp.com",
-  projectId: "osm-search-364115",
-  storageBucket: "osm-search-364115.appspot.com",
-  messagingSenderId: "919009657823",
-  appId: "1:919009657823:web:f3be7f8470a6c36665ba6a"
+  apiKey: "AIzaSyBEawXAq9pajlVKQtLopWyd_ELDwoUlbDo",
+  authDomain: "bellingcat-auto-archiver-b85db.firebaseapp.com",
+  projectId: "bellingcat-auto-archiver-b85db",
+  storageBucket: "bellingcat-auto-archiver-b85db.appspot.com",
+  messagingSenderId: "406209235111",
+  appId: "1:406209235111:web:f27327bed2db7295a43382",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
