@@ -139,7 +139,8 @@
               type="error"
               variant="outlined"
               closable
-            >{{ $store.state.errorMessage }}</v-alert>
+              >{{ $store.state.errorMessage }}</v-alert
+            >
             <v-text-field
               label="Google Sheet URL"
               v-model="spreadsheetUrl"
