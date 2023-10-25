@@ -298,7 +298,7 @@ export default new Vuex.Store({
             role: "writer",
             type: "user",
             emailAddress:
-              "m-auto-archiver@bc-auto-archiver.iam.gserviceaccount.com",
+              "bellingcat-auto-archiver-api@bellingcat-auto-archiver-b85db.iam.gserviceaccount.com",
           },
         });
 

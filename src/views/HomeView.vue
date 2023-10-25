@@ -7,7 +7,7 @@
             <v-alert color="#f2d97c" light icon="mdi-alert">
               This is a pre-release prototype demo service provided on a
               best-effort basis. Do not use for mission critical or sensitive
-              date.
+              data.
             </v-alert>
             <p>
               This tool will configure a Google Sheet on your Google account for

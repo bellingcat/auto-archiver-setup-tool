@@ -1,6 +1,10 @@
 <template>
   <v-app-bar style="flex-grow: 0" class="text-no-wrap">
-    <v-toolbar-title>Bellingcat Auto Archiver demo tool</v-toolbar-title>
+    <v-toolbar-title
+      ><router-link to="/" class="nodecoration"
+        >Bellingcat Auto Archiver demo tool</router-link
+      ></v-toolbar-title
+    >
     <v-spacer></v-spacer>
     <v-btn v-if="!user" @click="$store.dispatch('signin')">Sign In</v-btn>
     <span class="user" v-if="user">
@@ -27,5 +31,10 @@ export default {
 .user {
   margin-right: 1em;
   font-size: 80%;
+}
+
+.nodecoration {
+  color: inherit !important;
+  text-decoration: none !important;
 }
 </style>

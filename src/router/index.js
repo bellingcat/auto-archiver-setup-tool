@@ -10,6 +10,18 @@ const routes = [
     name: "home",
     component: HomeView,
   },
+  {
+    path: "/privacy",
+    name: "Privacy Policy",
+    component: () =>
+      import(/* webpackChunkName: "privacy" */ "../views/PrivacyView.vue"),
+  },
+  {
+    path: "/tos",
+    name: "Terms of Use",
+    component: () =>
+      import(/* webpackChunkName: "tos" */ "../views/TOSView.vue"),
+  },
 ];
 
 const router = new VueRouter({

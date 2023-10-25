@@ -5,6 +5,10 @@
       <v-main>
         <router-view />
       </v-main>
+      <v-footer class="legal">
+        <router-link to="/privacy">Privacy Policy</router-link>
+        <router-link to="/tos">Terms of Service</router-link>
+      </v-footer>
     </v-app>
   </div>
 </template>
@@ -35,5 +39,15 @@ export default {
 
 html {
   background-color: #d6e8de;
+}
+
+.legal a {
+  margin-left: 2em;
+  margin-right: 2em;
+  color: inherit !important;
+}
+
+.legal {
+  justify-content: center;
 }
 </style>
