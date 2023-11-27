@@ -14,6 +14,7 @@ import {
   addDoc,
   query,
   where,
+  limit,
   getDocs,
   doc,
   deleteDoc,
@@ -29,6 +30,7 @@ export default new Vuex.Store({
     access_token: null,
     docs: [],
     loading: false,
+    errorMessage: "",
   },
   mutations: {
     setUser(state, user) {
@@ -42,6 +44,9 @@ export default new Vuex.Store({
     },
     setAccessToken(state, access_token) {
       state.access_token = access_token;
+    },
+    setErrorMessage(state, errorMessage) {
+      state.errorMessage = errorMessage;
     },
   },
   actions: {
@@ -282,7 +287,7 @@ export default new Vuex.Store({
                       endColumnIndex: 11,
                     },
                     description:
-                      "Protecting header row (needed for auto-archiver)",
+                      "Protecting header row (needed for auto-archiver), do not modify archiving column names, you can add and move columns around when no 'Archive in Progress' is present in the 'Archive status' column.",
                     warningOnly: true,
                   },
                 },
@@ -314,6 +319,46 @@ export default new Vuex.Store({
 
         dispatch("getDocs");
       } catch (error) {
+        console.error("add (firebase.js): ", error);
+      }
+    },
+
+    async enable({ state, dispatch, commit }, { spreadsheetId }) {
+      commit("setLoading", true);
+      commit("setErrorMessage", "");
+
+      try {
+        // fetch existing sheet
+        const sheetToEnable = await gapi.client.sheets.spreadsheets.get({
+          spreadsheetId: spreadsheetId,
+        });
+
+        const q = query(
+          collection(firebaseFirestore, "sheets"),
+          where("uid", "==", state.user.uid),
+          where("sheetId", "==", spreadsheetId),
+          limit(1)
+        );
+
+        const response = await getDocs(q);
+        if(response.docs.length > 0) {
+          throw "Sheet already enabled";
+        }
+
+        const col = await collection(firebaseFirestore, "sheets");
+        await addDoc(col, {
+          sheetId: spreadsheetId,
+          url: sheetToEnable.result.spreadsheetUrl,
+          timestamp: Date.now(),
+          uid: state.user.uid,
+          lastArchived: null,
+          name: sheetToEnable.result.properties.title,
+        });
+
+        dispatch("getDocs");
+      } catch (error) {
+        commit("setErrorMessage", `Unable to add sheet: ${JSON.stringify(error)}`);
+        commit("setLoading", false);
         console.error("add (firebase.js): ", error);
       }
     },

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="margin-bottom: 1em">
     <div class="text-h5 mt-5 mb-3" v-if="docs.length > 0">
-      Your auto-archiver documents
+      Your auto-archiver sheets
     </div>
     <v-row v-for="doc in docs" :key="doc.sheetId">
       <v-col>
