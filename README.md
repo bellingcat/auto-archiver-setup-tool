@@ -22,3 +22,10 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### Release process
+1. install firebase locally
+2. login to your firebase account with `firebase login`
+3. make sure you have access to the project `firebase projects:list`
+4. build `yarn build` and then release `firebase deploy --only hosting`
