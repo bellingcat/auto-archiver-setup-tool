@@ -71,7 +71,7 @@ exports.processSheetScheduler = onSchedule(
 
       await doc.ref.update({ lastArchived: Date.now() });
 
-      await sleep(1000);
+      await sleep(100);
     });
   }
 );
