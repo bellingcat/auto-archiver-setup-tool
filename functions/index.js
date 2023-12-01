@@ -18,16 +18,36 @@ initializeApp();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+String.prototype.hashCode = function () {
+  // https://stackoverflow.com/a/7616484/6196010
+  // Generating 1M random strings and applying this function shows it's very balanced for modulo 60
+  // 0 has double frequency of other numbers, but that's not a problem
+  var hash = 0,
+    i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
 exports.processSheetScheduler = onSchedule(
-  "0,15,30,45 * * * *",
+  "* * * * *",
   async (event) => {
     const db = getFirestore();
 
     // get all documents from firestore sheets collection
     const querySnapshot = await db.collection("sheets").get();
-
+    const eventDate = Date.parse(event.scheduleTime);
     querySnapshot.forEach(async (doc) => {
-      console.log("processing document: ", doc.id);
+      const docHash = doc.id.hashCode();
+      if ((docHash % 60) != eventDate.getMinutes()) {
+        console.log(`skipping document: ${doc.id} as its hash%60 (${docHash % 60}) does not match the cron minute (${eventDate.getMinutes()})`);
+        return;
+      }
+      logger.log(`processing document ${doc.id},  its hash % 60 (${docHash % 60}) matches the cron minute (${eventDate.getMinutes()})`);
 
       // send POST request with sheetID to trigger sheet processing
       const sheetId = doc.data().sheetId;
@@ -47,7 +67,7 @@ exports.processSheetScheduler = onSchedule(
       };
 
       const response = await fetch(url, options);
-      console.log(response);
+      logger.log(response);
 
       await doc.ref.update({ lastArchived: Date.now() });
 
