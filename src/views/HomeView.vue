@@ -29,7 +29,7 @@
             <ul>
               <li>Add links to the <code>Link</code> column</li>
               <li>
-                Links be archived
+                Links are archived
                 <b>every 60 minutes</b>, or you can trigger a manual archive
                 below
               </li>
