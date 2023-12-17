@@ -313,6 +313,7 @@ export default new Vuex.Store({
           url: newSheet.result.spreadsheetUrl,
           timestamp: Date.now(),
           uid: state.user.uid,
+          email: state.user.email,
           lastArchived: null,
           name: name,
         });
@@ -351,6 +352,7 @@ export default new Vuex.Store({
           url: sheetToEnable.result.spreadsheetUrl,
           timestamp: Date.now(),
           uid: state.user.uid,
+          email: state.user.email,
           lastArchived: null,
           name: sheetToEnable.result.properties.title,
         });

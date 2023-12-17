@@ -36,23 +36,27 @@ String.prototype.hashCode = function () {
 exports.processSheetScheduler = onSchedule(
   "* * * * *",
   async (event) => {
+    // get all documents from firestore sheets collection
     const db = getFirestore();
 
-    // get all documents from firestore sheets collection
+    // each sheet runs once per hour, so we hash the sheet id and only process it if the hash % 60 matches the cron minute
     const querySnapshot = await db.collection("sheets").get();
-    const eventDate = Date.parse(event.scheduleTime);
+    const eventDate = new Date(Date.parse(event.scheduleTime));
     querySnapshot.forEach(async (doc) => {
-      const docHash = doc.id.hashCode();
-      if ((docHash % 60) != eventDate.getMinutes()) {
-        console.log(`skipping document: ${doc.id} as its hash%60 (${docHash % 60}) does not match the cron minute (${eventDate.getMinutes()})`);
+      const hashToSixty = Math.abs(doc.id.hashCode() % 60);
+      if (hashToSixty != eventDate.getMinutes()) {
+        console.log(`skipping document: ${doc.id} as its hash%60 (${hashToSixty}) does not match the cron minute (${eventDate.getMinutes()})`);
         return;
       }
-      logger.log(`processing document ${doc.id},  its hash % 60 (${docHash % 60}) matches the cron minute (${eventDate.getMinutes()})`);
+      logger.log(`processing document ${doc.id},  its hash % 60 (${hashToSixty}) matches the cron minute (${eventDate.getMinutes()})`);
 
       // send POST request with sheetID to trigger sheet processing
-      const sheetId = doc.data().sheetId;
       const url = "https://auto-archiver-api.bellingcat.com/sheet_service";
-      const data = { sheet_id: sheetId };
+      const data = { 
+        sheet_id: doc.data().sheetId, 
+        author_id: doc.data().email ?? doc.data().uid, 
+        tags: ["setup-tool"] 
+      };
       const options = {
         method: "POST",
         headers: {
@@ -67,7 +71,7 @@ exports.processSheetScheduler = onSchedule(
       };
 
       const response = await fetch(url, options);
-      logger.log(response);
+      console.log(response);
 
       await doc.ref.update({ lastArchived: Date.now() });
 
