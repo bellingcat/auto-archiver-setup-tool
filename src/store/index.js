@@ -136,6 +136,7 @@ export default new Vuex.Store({
             },
             body: JSON.stringify({
               sheet_id: sheet.sheetId,
+              author_id: state.user.email,
             }),
           }
         );
