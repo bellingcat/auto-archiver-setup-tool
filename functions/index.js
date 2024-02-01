@@ -62,9 +62,9 @@ exports.processSheetScheduler = onSchedule(
         headers: {
           "Content-Type": "application/json",
           Authorization:
-            "Basic " +
+            "Bearer " +
             Buffer.from(
-              "service:password"
+              "password"
             ).toString("base64"),
         },
         body: JSON.stringify(data),
