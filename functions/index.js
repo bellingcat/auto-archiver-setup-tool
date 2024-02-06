@@ -14,6 +14,9 @@ const logger = require("firebase-functions/logger");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 
+const { defineSecret } = require('firebase-functions/params');
+const API_TOKEN = defineSecret('API_SERVICE_PASSWORD');
+
 initializeApp();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -34,7 +37,7 @@ String.prototype.hashCode = function () {
 }
 
 exports.processSheetScheduler = onSchedule(
-  "* * * * *",
+  { secrets: [API_TOKEN], schedule: "* * * * *" },
   async (event) => {
     // get all documents from firestore sheets collection
     const db = getFirestore();
@@ -52,20 +55,16 @@ exports.processSheetScheduler = onSchedule(
 
       // send POST request with sheetID to trigger sheet processing
       const url = "https://auto-archiver-api.bellingcat.com/sheet_service";
-      const data = { 
-        sheet_id: doc.data().sheetId, 
-        author_id: doc.data().email ?? doc.data().uid, 
-        tags: ["setup-tool"] 
+      const data = {
+        sheet_id: doc.data().sheetId,
+        author_id: doc.data().email ?? doc.data().uid,
+        tags: ["setup-tool"]
       };
       const options = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "Bearer " +
-            Buffer.from(
-              "password"
-            ).toString("base64"),
+          Authorization: `Bearer ${API_TOKEN.value()}`,
         },
         body: JSON.stringify(data),
       };
