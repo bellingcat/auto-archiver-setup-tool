@@ -16,6 +16,10 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 const { defineSecret } = require('firebase-functions/params');
 const API_TOKEN = defineSecret('API_SERVICE_PASSWORD');
+const CLIENT_EMAIL = defineSecret('GOOGLE_API_CLIENT_EMAIL');
+const PRIVATE_KEY = defineSecret('GOOGLE_API_PRIVATE_KEY');
+
+const { google } = require('googleapis');
 
 initializeApp();
 
@@ -37,8 +41,12 @@ String.prototype.hashCode = function () {
 }
 
 exports.processSheetScheduler = onSchedule(
-  { secrets: [API_TOKEN], schedule: "* * * * *" },
+  { secrets: [API_TOKEN, CLIENT_EMAIL, PRIVATE_KEY], schedule: "* * * * *" },
   async (event) => {
+    // authenticate the service account
+    const googleAuth = new google.auth.JWT(CLIENT_EMAIL.value(), null, PRIVATE_KEY.value().replace(/\\n/g, '\n'), 'https://www.googleapis.com/auth/spreadsheets');
+    const sheets = await google.sheets({ version: 'v4', auth: googleAuth });
+
     // get all documents from firestore sheets collection
     const db = getFirestore();
 
@@ -48,19 +56,17 @@ exports.processSheetScheduler = onSchedule(
     querySnapshot.forEach(async (doc) => {
       const hashToSixty = Math.abs(doc.id.hashCode() % 60);
       if (hashToSixty != eventDate.getMinutes()) {
-        console.log(`skipping document: ${doc.id} as its hash%60 (${hashToSixty}) does not match the cron minute (${eventDate.getMinutes()})`);
         return;
       }
       logger.log(`processing document ${doc.id}, its hash % 60 (${hashToSixty}) matches the cron minute (${eventDate.getMinutes()})`);
 
-      // try to access the spreadsheet and delete the document if it's not found, users will delete/change auth on sheets and we don't want to keep processing them
       try {
-        s3 = await gapi.client.sheets.spreadsheets.get({spreadsheetId: doc.id,});
+        await sheets.spreadsheets.get({ spreadsheetId: doc.data().sheetId });
       } catch (e) {
-        logger.log(e);
         if (e.status == 404) {
           await doc.ref.delete();
-          logger.log(`document ${doc.id} not found, deleted`);
+          logger.log(`document ${doc.data().sheetId} not found, deleted`);
+          return;
         }
       }
 

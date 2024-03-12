@@ -30,5 +30,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 3. make sure you have access to the project `firebase projects:list`
 4. build `yarn build` and then release `firebase deploy --only hosting`
 5. to update schedule functions `firebase deploy --only functions`
-6. to update secrets use `firebase functions:secrets:set SECRET_NAME` more info [here](https://firebase.google.com/docs/functions/config-env?gen=2nd#managing_secrets)
+6. if you add any library to a function, install it inside the `/functions` folder and not in the root folder
+7. to update secrets use `firebase functions:secrets:set SECRET_NAME` more info [here](https://firebase.google.com/docs/functions/config-env?gen=2nd#managing_secrets)
    1. `API_SERVICE_PASSWORD` for the auto-archiver-api
+   2. `GOOGLE_API_CLIENT_EMAIL` and `GOOGLE_API_PRIVATE_KEY` for the scheduled function to validate sheets exist
