@@ -342,7 +342,7 @@ export default new Vuex.Store({
         );
 
         const response = await getDocs(q);
-        if(response.docs.length > 0) {
+        if (response.docs.length > 0) {
           throw "Sheet already enabled";
         }
 

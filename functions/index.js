@@ -51,7 +51,18 @@ exports.processSheetScheduler = onSchedule(
         console.log(`skipping document: ${doc.id} as its hash%60 (${hashToSixty}) does not match the cron minute (${eventDate.getMinutes()})`);
         return;
       }
-      logger.log(`processing document ${doc.id},  its hash % 60 (${hashToSixty}) matches the cron minute (${eventDate.getMinutes()})`);
+      logger.log(`processing document ${doc.id}, its hash % 60 (${hashToSixty}) matches the cron minute (${eventDate.getMinutes()})`);
+
+      // try to access the spreadsheet and delete the document if it's not found, users will delete/change auth on sheets and we don't want to keep processing them
+      try {
+        s3 = await gapi.client.sheets.spreadsheets.get({spreadsheetId: doc.id,});
+      } catch (e) {
+        logger.log(e);
+        if (e.status == 404) {
+          await doc.ref.delete();
+          logger.log(`document ${doc.id} not found, deleted`);
+        }
+      }
 
       // send POST request with sheetID to trigger sheet processing
       const url = "https://auto-archiver-api.bellingcat.com/sheet_service";
