@@ -18,6 +18,34 @@ import {
 } from "firebase/firestore";
 import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
 
+function saveToLocalStorage(state) {
+  localStorage.setItem("user", JSON.stringify(state.user));
+  localStorage.setItem("access_token", state.access_token);
+}
+
+function loadFromLocalStorage() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const access_token = localStorage.getItem("access_token");
+  return { user, access_token };
+}
+
+function clearLocalStorage() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("access_token");
+}
+async function waitForGapiAuth2() {
+  return new Promise((resolve, reject) => {
+    const checkGapiAuth2 = () => {
+      if (gapi.auth2 && gapi.auth2.getAuthInstance()) {
+        resolve(gapi.auth2.getAuthInstance());
+      } else {
+        setTimeout(checkGapiAuth2, 100);
+      }
+    };
+    checkGapiAuth2();
+  });
+}
+
 export default createStore({
   state: {
     user: null,
@@ -31,6 +59,7 @@ export default createStore({
   mutations: {
     setUser(state, user) {
       state.user = user;
+      saveToLocalStorage(state);
     },
     setUserActiveState(state, active) {
       state.user.active = active;
@@ -43,6 +72,7 @@ export default createStore({
     },
     setAccessToken(state, access_token) {
       state.access_token = access_token;
+      saveToLocalStorage(state);
     },
     setErrorMessage(state, errorMessage) {
       state.errorMessage = errorMessage;
@@ -76,17 +106,22 @@ export default createStore({
     },
 
     async signout({ commit }) {
-      console.log("sign out");
       try {
-        await gapi.auth2.getAuthInstance().signOut();
-        console.log("User is signed out from gapi.");
+        const authInstance = await waitForGapiAuth2();
+        if (authInstance) {
+          await authInstance.signOut();
+          console.log("User is signed out from gapi.");
+        } else {
+          console.warn("gapi.auth2 is not initialized.");
+        }
 
         await signOut(firebaseAuth);
         console.log("User is signed out from firebase.");
 
-        // clean user from store
+        // clean user from store and local storage
         commit("setUser", null);
         commit("setDocs", []);
+        clearLocalStorage();
       } catch (error) {
         console.error("signOutUser (firebase/auth.js): ", error);
       }
@@ -390,4 +425,44 @@ export default createStore({
       }
     },
   },
+  getters: {
+    isTokenExpired: async (state) => {
+      if (!state.access_token) return true;
+      try {
+        const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${state.access_token}`);
+        const data = await response.json();
+        if (data.expires_in > 0) return false;
+      } catch (error) {
+        console.error("Error checking token expiration:", error);
+        return true;
+      }
+    },
+  },
+  modules: {},
+  plugins: [
+    (store) => {
+      store.subscribe((mutation, state) => {
+        if (mutation.type === "setUser" || mutation.type === "setAccessToken") {
+          saveToLocalStorage(state);
+        }
+      });
+
+      const { user, access_token } = loadFromLocalStorage();
+      if (user && access_token) {
+        store.commit("setUser", user);
+        store.commit("setAccessToken", access_token);
+        store.getters.isTokenExpired.then((expired) => {
+          if (expired) {
+            store.dispatch("signout");
+          } else {
+            store.dispatch("checkActiveUser");
+            store.dispatch("getDocs");
+          }
+        }).catch((error) => {
+          console.error("Error checking token expiration:", error);
+          store.dispatch("signout");
+        });
+      }
+    },
+  ],
 });
