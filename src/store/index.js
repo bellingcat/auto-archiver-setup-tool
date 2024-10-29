@@ -18,8 +18,6 @@ import {
 } from "firebase/firestore";
 import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
 
-const API_ENDPOINT = "https://auto-archiver-api.bellingcat.com";
-
 export default createStore({
   state: {
     user: null,
@@ -28,6 +26,7 @@ export default createStore({
     docs: [],
     loading: false,
     errorMessage: "",
+    API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
   },
   mutations: {
     setUser(state, user) {
@@ -93,11 +92,11 @@ export default createStore({
       }
     },
 
-    async checkActiveUser({ state, commit, dispatch }) {
+    async checkActiveUser({ state, commit }) {
       try {
         commit("setErrorMessage", "");
         const r = await fetch(
-          `${API_ENDPOINT}/user/active`,
+          `${state.API_ENDPOINT}/user/active`,
           {
             method: "GET",
             headers: {
@@ -112,7 +111,6 @@ export default createStore({
         console.error("checkActiveUser (firebase.js): ", error);
         commit("setErrorMessage", "Unable to check user status against the API");
       }
-
     },
 
     async getDocs({ state, commit }) {
@@ -152,7 +150,7 @@ export default createStore({
         // send a post request to the API with the sheet ID in the body
         // and a bearer auth token in the header
         await fetch(
-          `${API_ENDPOINT}/sheet`,
+          `${state.API_ENDPOINT}/sheet`,
           {
             method: "POST",
             headers: {
