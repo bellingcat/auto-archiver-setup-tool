@@ -1,32 +1,34 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import HomeView from "../views/HomeView.vue";
-
-Vue.use(VueRouter);
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import SheetView from '../views/SheetView.vue';
 
 const routes = [
   {
-    path: "/",
-    name: "home",
+    path: '/',
+    name: 'home',
     component: HomeView,
   },
   {
-    path: "/privacy",
-    name: "Privacy Policy",
-    component: () =>
-      import(/* webpackChunkName: "privacy" */ "../views/PrivacyView.vue"),
+    path: '/sheets',
+    name: 'sheets',
+    component: SheetView,
   },
   {
-    path: "/tos",
-    name: "Terms of Use",
+    path: '/privacy',
+    name: 'Privacy Policy',
     component: () =>
-      import(/* webpackChunkName: "tos" */ "../views/TOSView.vue"),
+      import(/* webpackChunkName: "privacy" */ '../views/PrivacyView.vue'),
+  },
+  {
+    path: '/tos',
+    name: 'Terms of Use',
+    component: () =>
+      import(/* webpackChunkName: "tos" */ '../views/TOSView.vue'),
   },
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 

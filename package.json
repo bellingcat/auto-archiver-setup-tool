@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 8081",
+    "serve": "vue-cli-service serve --port 8081 --skip-plugins @vue/cli-plugin-eslint",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -14,10 +14,10 @@
     "firebaseui": "^6.0.2",
     "gapi-script": "^1.2.0",
     "googleapis": "^134.0.0",
-    "vue": "^2.6.14",
-    "vue-router": "^3.5.1",
-    "vuetify": "^2.6.15",
-    "vuex": "^3.6.2",
+    "vue": "^3",
+    "vue-router": "^4",
+    "vuetify": "^3",
+    "vuex": "^4",
     "vuex-easy-firestore": "^1.37.2"
   },
   "devDependencies": {
