@@ -1,8 +1,4 @@
-import Vue from "vue";
-import Vuex from "vuex";
-
-/* eslint-disable */
-// eslint-disable-next-line
+import { createStore } from "vuex";
 import { gapi, client } from "@/gapi";
 import {
   signOut,
@@ -22,11 +18,12 @@ import {
 } from "firebase/firestore";
 import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
 
-Vue.use(Vuex);
+const API_ENDPOINT = "https://auto-archiver-api.bellingcat.com";
 
-export default new Vuex.Store({
+export default createStore({
   state: {
     user: null,
+    active: false,
     access_token: null,
     docs: [],
     loading: false,
@@ -35,6 +32,9 @@ export default new Vuex.Store({
   mutations: {
     setUser(state, user) {
       state.user = user;
+    },
+    setUserActiveState(state, active) {
+      state.user.active = active;
     },
     setDocs(state, docs) {
       state.docs = docs;
@@ -59,12 +59,12 @@ export default new Vuex.Store({
         const response = await signInWithCredential(firebaseAuth, credential);
 
         commit("setUser", response.user);
+        dispatch("checkActiveUser");
         dispatch("getDocs");
       }
 
       commit("setUser", null);
 
-      // eslint-disable-next-line
       const client = google.accounts.oauth2.initTokenClient({
         client_id:
           "406209235111-r1mpkvkfaqc2jg5iqbvffl2b0rf4clbo.apps.googleusercontent.com",
@@ -93,7 +93,32 @@ export default new Vuex.Store({
       }
     },
 
+    async checkActiveUser({ state, commit, dispatch }) {
+      try {
+        commit("setErrorMessage", "");
+        const r = await fetch(
+          `${API_ENDPOINT}/user/active`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${state.access_token}`,
+            },
+          }
+        );
+        const response = await r.json();
+        commit("setUserActiveState", response.active);
+      } catch (error) {
+        console.error("checkActiveUser (firebase.js): ", error);
+        commit("setErrorMessage", "Unable to check user status against the API");
+      }
+
+    },
+
     async getDocs({ state, commit }) {
+      if (!state.user || !state.user.active) {
+        return;
+      }
       try {
         // get documents where uid matches user
 
@@ -127,7 +152,7 @@ export default new Vuex.Store({
         // send a post request to the API with the sheet ID in the body
         // and a bearer auth token in the header
         await fetch(
-          "https://auto-archiver-api.bellingcat.com/sheet",
+          `${API_ENDPOINT}/sheet`,
           {
             method: "POST",
             headers: {
@@ -330,9 +355,11 @@ export default new Vuex.Store({
 
       try {
         // fetch existing sheet
+        console.log(spreadsheetId);
         const sheetToEnable = await gapi.client.sheets.spreadsheets.get({
           spreadsheetId: spreadsheetId,
         });
+        console.log(sheetToEnable);
 
         const q = query(
           collection(firebaseFirestore, "sheets"),

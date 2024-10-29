@@ -25,6 +25,10 @@ export default {
 </script>
 
 <style>
+:root {
+  --v-card-text-opacity: 0.85;
+}
+
 .pane {
   max-width: 800px;
   margin-left: auto;
@@ -49,5 +53,31 @@ html {
 
 .legal {
   justify-content: center;
+  max-height: 50px;
+}
+
+ol,
+ul {
+  padding-left: 16px;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+.v-alert {
+  margin-bottom: 16px;
+}
+
+code {
+  background-color: rgba(0, 0, 0, .1);
+  padding: .2em .4em;
+}
+
+.v-card .v-card-text {
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.7rem;
+  letter-spacing: .0092em;
 }
 </style>

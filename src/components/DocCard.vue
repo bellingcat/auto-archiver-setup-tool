@@ -19,16 +19,18 @@
         <v-col>
           <v-btn :href="doc.url" target="_blank"
             >Open sheet
-            <v-icon small style="margin-left: 1em">mdi-open-in-new</v-icon>
+            <v-icon size="small" style="margin-left: 1em"
+              >mdi-open-in-new</v-icon
+            >
           </v-btn>
         </v-col>
         <v-col>
           <v-btn @click="$store.dispatch('archive', doc)">Archive now</v-btn>
         </v-col>
         <v-dialog width="500" v-model="dialog" persistent :retain-focus="false">
-          <template v-slot:activator="{ on, attrs }">
+          <template v-slot:activator="{ props }">
             <v-col class="text-right">
-              <v-btn color="#f2d97c" right v-bind="attrs" v-on="on"
+              <v-btn color="#f2d97c" location="right" v-bind="props"
                 >Stop archiving</v-btn
               >
             </v-col>
@@ -47,7 +49,9 @@
             <v-card-actions>
               <v-btn @click="dialog = false" color="primary">Cancel</v-btn>
               <v-spacer></v-spacer>
-              <v-btn color="red" text @click="remove"> Stop archiving </v-btn>
+              <v-btn color="red" variant="text" @click="remove">
+                Stop archiving
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
