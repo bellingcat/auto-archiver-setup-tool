@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import SheetView from '../views/SheetView.vue';
+import UrlView from '../views/UrlView.vue';
 
 const routes = [
   {
@@ -10,8 +11,13 @@ const routes = [
   },
   {
     path: '/sheets',
-    name: 'sheets',
+    name: 'Google Sheets Archiving',
     component: SheetView,
+  },
+  {
+    path: '/urls',
+    name: 'URL Archiving',
+    component: UrlView,
   },
   {
     path: '/privacy',

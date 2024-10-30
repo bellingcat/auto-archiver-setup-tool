@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createVuetify } from "vuetify";
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { VDateInput } from 'vuetify/labs/VDateInput';
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -10,7 +11,7 @@ import "@mdi/font/css/materialdesignicons.css";
 import "./styles/global.css";
 
 const vuetify = createVuetify({
-  components,
+  components: { ...components, VDateInput, },
   directives,
 });
 

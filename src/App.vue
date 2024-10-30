@@ -1,16 +1,14 @@
 <template>
-  <div class="pane">
-    <v-app class="bg">
-      <NavBar />
-      <v-main>
-        <router-view />
-      </v-main>
-      <v-footer class="legal">
-        <router-link to="/privacy">Privacy Policy</router-link>
-        <router-link to="/tos">Terms of Service</router-link>
-      </v-footer>
-    </v-app>
-  </div>
+  <v-app class="bg">
+    <NavBar />
+    <v-main>
+      <router-view />
+    </v-main>
+    <v-footer class="legal">
+      <router-link to="/privacy">Privacy Policy</router-link>
+      <router-link to="/tos">Terms of Service</router-link>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
@@ -33,8 +31,13 @@ export default {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  height: 100vh;
-  background-color: #d6e8de !important;
+  /* height: 100vh; */
+}
+
+.pane-l {
+  max-width: 1200px;
+  /* margin-left: auto;
+  margin-right: auto; */
 }
 
 .bg {

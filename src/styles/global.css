@@ -1,3 +1,13 @@
 html {
 	overflow-y: auto;
 }
+
+a {
+	color: #1a73e8;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #0c47a1;
+	text-decoration: underline;
+}

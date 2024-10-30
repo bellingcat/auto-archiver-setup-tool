@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pane">
     <v-row>
       <v-col>
         <v-card style="margin-bottom: 1em">
@@ -132,15 +132,7 @@
                 if it is not
               </li>
             </ol>
-            <v-alert
-              v-if="$store.state.errorMessage"
-              title="Error"
-              text
-              type="error"
-              variant="outlined"
-              closable
-              >{{ $store.state.errorMessage }}</v-alert
-            >
+            
             <v-text-field
               label="Google Sheet URL"
               v-model="spreadsheetUrl"
@@ -171,7 +163,7 @@
 import DocList from "@/components/DocList.vue";
 
 export default {
-  name: "HomeView",
+  name: "SheetView",
   components: {
     DocList,
   },

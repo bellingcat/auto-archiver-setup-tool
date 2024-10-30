@@ -430,6 +430,7 @@ export default createStore({
       if (!state.access_token) return true;
       try {
         const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${state.access_token}`);
+        if (response.status !== 200) return true;
         const data = await response.json();
         if (data.expires_in > 0) return false;
       } catch (error) {
