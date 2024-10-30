@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pane">
     <h2>Bellingcat Privacy Policy</h2>
     <p>
       Your privacy is important to us. It is Bellingcat&#39;s policy to respect

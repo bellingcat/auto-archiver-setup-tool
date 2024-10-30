@@ -33,7 +33,7 @@
       </template>
       <v-list>
         <v-list-item to="urls">
-          <v-btn prepend-icon="mdi-link" variant="plain">URL</v-btn>
+          <v-btn prepend-icon="mdi-magnify" variant="plain">Search Archives</v-btn>
         </v-list-item>
         <v-list-item to="sheets">
           <v-btn prepend-icon="mdi-table-large" variant="plain">Sheet</v-btn>

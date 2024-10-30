@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pane">
     <h2>Bellingcat Terms of Service</h2>
     <p>
       These Terms of Service govern your use of the website located at

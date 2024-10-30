@@ -4,9 +4,25 @@
     <v-main>
       <router-view />
     </v-main>
-    <v-footer class="legal">
-      <router-link to="/privacy">Privacy Policy</router-link>
-      <router-link to="/tos">Terms of Service</router-link>
+    <v-footer class="text-center">
+      <v-row>
+        <v-col cols="12">
+          <div class="legal py-2">
+            <router-link to="/privacy">Privacy Policy</router-link>
+            <router-link to="/tos">Terms of Service</router-link>
+          </div>
+        </v-col>
+        <v-col cols="12">
+          This tool uses <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a> to
+          archive online content. 
+          <br/>For more information see
+          <a href="https://github.com/bellingcat/auto-archiver">our Github repository</a>
+          and the <a
+            href="https://www.bellingcat.com/resources/2022/09/22/preserve-vital-online-content-with-bellingcats-auto-archiver-tool/">associated
+            article</a>.
+        </v-col>
+      </v-row>
+
     </v-footer>
   </v-app>
 </template>
@@ -31,13 +47,10 @@ export default {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  /* height: 100vh; */
 }
 
 .pane-l {
   max-width: 1200px;
-  /* margin-left: auto;
-  margin-right: auto; */
 }
 
 .bg {
@@ -52,11 +65,17 @@ html {
   margin-left: 2em;
   margin-right: 2em;
   color: inherit !important;
+  font-weight: 500;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
 }
 
-.legal {
-  justify-content: center;
-  max-height: 50px;
+footer, .v-footer, .v-footer div {
+  margin: 0px;
+  padding: 0px;
+}
+.v-footer {
+  max-height: 125px;
 }
 
 ol,

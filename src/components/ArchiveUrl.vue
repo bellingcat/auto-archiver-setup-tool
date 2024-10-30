@@ -20,7 +20,8 @@
               density="compact" :disabled="!groupsLoaded"></v-select>
           </v-col>
           <v-col cols="12" md="4" class="text-right">
-            <v-btn @click="archiveUrl" color="primary" :disabled="!validUrl || loadingGroups || loadingArchive || (!public && group == -1)">
+            <v-btn @click="archiveUrl" color="primary"
+              :disabled="!validUrl || loadingGroups || loadingArchive || (!public && group == -1)">
               Archive
             </v-btn>
           </v-col>
@@ -32,14 +33,16 @@
               Archive in progress task id = <code>{{ taskId }}</code>
             </p>
             <v-alert color="success" icon="mdi-information" v-if="archiveResult">
-              Archived successfully with id {{ taskId }} available <a :href="getUrlFromResult(archiveResult)" target="_blank">here</a>.
+              Archived successfully with id {{ taskId }} available <a :href="getUrlFromResult(archiveResult)"
+                target="_blank">here</a>.
             </v-alert>
             <v-alert color="warning" icon="mdi-alert" v-if="archiveFailure">
-              Failure: {{archiveFailure}} 
+              Failure: {{ archiveFailure }}
             </v-alert>
             <p v-if="validUrl">
-              You can <strong v-if="archiveFailure">still</strong> <router-link :to="`/urls?url=${encodeURIComponent(url)}`"
-                target="_blank"><v-icon>mdi-open-in-new</v-icon> search for archives</router-link> of
+              You can <strong v-if="archiveFailure">still</strong> <router-link
+                :to="`/urls?url=${encodeURIComponent(url)}`" target="_blank"><v-icon>mdi-open-in-new</v-icon> search for
+                archives</router-link> of
               this URL.
             </p>
           </v-col>
@@ -65,7 +68,7 @@ export default {
       groupsLoaded: false,
       availableGroups: [],
 
-      url: "",
+      url: "https://t.me/cnn_world_news/34794",
       public: true,
       group: -1,
       loadingArchive: false,
@@ -95,11 +98,9 @@ export default {
       if (!val) this.loadGroups();
     },
     url(val) {
-      if (this.validUrl) {
-        this.archiveResult = null;
-        this.archiveFailure = null;
-        this.taskId = null;
-      }
+      this.archiveResult = null;
+      this.archiveFailure = null;
+      this.taskId = null;
     },
   },
   methods: {
@@ -134,7 +135,6 @@ export default {
           return response.json();
         })
         .then(res => {
-          console.log("archiveUrl response", res);
           this.taskId = res.id;
           this.showSnackbar(`Your URL is being archived with id ${this.taskId}!`, "green");
           this.pollForArchiveResults();
