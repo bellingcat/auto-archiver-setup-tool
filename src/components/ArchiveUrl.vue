@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pane">
+  <v-container class="pane" v-if="user?.active" >
     <v-card :loading="loadingArchive">
       <v-card-title class="text-center">
         Archive a single URL
@@ -20,7 +20,7 @@
               density="compact"></v-select>
           </v-col>
           <v-col cols="12" md="4" class="text-right">
-            <v-btn @click="archiveUrl" color="primary"
+            <v-btn @click="archiveUrl" color="teal"
               :disabled="!validUrl || loadingArchive || (!public && group == -1)">
               Archive
             </v-btn>
@@ -29,7 +29,7 @@
         <v-row>
           <v-col cols="12">
             <p v-if="loadingArchive">
-              <v-progress-circular color="primary" indeterminate></v-progress-circular>
+              <v-progress-circular color="teal" indeterminate></v-progress-circular>
               Archive in progress task id = <code>{{ taskId }}</code>
             </p>
             <v-alert color="success" icon="mdi-information" v-if="archiveResult">
@@ -41,7 +41,7 @@
             </v-alert>
             <p v-if="validUrl">
               You can <strong v-if="archiveFailure">still</strong> <router-link
-                :to="`/urls?url=${encodeURIComponent(url)}`" target="_blank"><v-icon>mdi-open-in-new</v-icon> search for
+                :to="`/archives?url=${encodeURIComponent(url)}`" target="_blank"><v-icon>mdi-open-in-new</v-icon> search for
                 archives</router-link> of
               this URL.
             </p>
@@ -81,6 +81,9 @@ export default {
     };
   },
   computed: {
+    user() {
+      return this.$store.state.user;
+    },
     urlValidator() {
       return urlValidator;
     },
@@ -92,9 +95,6 @@ export default {
     },
   },
   watch: {
-    // public(val) {
-    //   if (!val) this.loadGroups();
-    // },
     url(val) {
       this.archiveResult = null;
       this.archiveFailure = null;

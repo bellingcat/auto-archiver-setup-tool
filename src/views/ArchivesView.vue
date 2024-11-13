@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pane-l">
+  <v-container class="pane-l" v-if="user?.active">
     <v-row>
       <v-col>
         <v-card elevation="12">
@@ -23,7 +23,7 @@
                 variant="outlined" :rules="[urlValidator]" required @keyup.enter="searchForArchives"></v-text-field>
               <v-row>
                 <v-col cols="12" class="text-right">
-                  <v-btn @click="searchForArchives" color="primary" class="mt-4" size="large" :disabled="!validUrl">
+                  <v-btn @click="searchForArchives" color="teal" class="mt-4" size="large" :disabled="!validUrl">
                     Search
                   </v-btn>
                 </v-col>
@@ -103,7 +103,7 @@
 <script>
 import { urlValidator, getUrlFromResult } from "@/utils/misc.js";
 export default {
-  name: "UrlView",
+  name: "ArchivesView",
   data() {
     return {
       today: new Date().toISOString().substring(0, 10),

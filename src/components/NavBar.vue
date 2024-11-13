@@ -1,8 +1,8 @@
 <template>
   <v-app-bar style="flex-grow: 0" class="text-no-wrap">
-    <v-toolbar-title title="Bellingcat Auto Archiver demo">
+    <v-toolbar-title title="Bellingcat Auto Archiver prototype">
       <router-link to="/" class="nodecoration">
-        Bellingcat Auto Archiver demo
+        Bellingcat Auto Archiver prototype
       </router-link>
     </v-toolbar-title>
 
@@ -13,9 +13,9 @@
     </v-chip>
 
     <v-spacer v-if="!smAndDown"></v-spacer>
-    <div v-if="user && !smAndDown">
+    <div v-if="user?.active && !smAndDown">
       <template v-for="btn in btns">
-        <v-btn :to="btn.to" :prepend-icon="btn.icon" variant="text" class="nodecoration" size="large">
+        <v-btn :to="btn.to" :prepend-icon="btn.icon" variant="text" class="nodecoration ml-2" size="large" active-color="teal">
           {{ btn.text }}
           <v-tooltip activator="parent" location="bottom">{{ btn.tooltip }}</v-tooltip>
         </v-btn>
@@ -42,7 +42,7 @@
 
     <v-btn v-if="!user" @click="$store.dispatch('signin')">Sign In</v-btn>
 
-    <v-menu v-if="user && smAndDown">
+    <v-menu v-if="user?.active && smAndDown">
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props"></v-app-bar-nav-icon>
       </template>
@@ -73,9 +73,9 @@ export default {
     return {
       drawer: false,
       btns: [
-        { to: "/", icon: "mdi-cloud-download-outline", text: "URL", tooltip: "Archive a single URL." },
-        { to: "/urls", icon: "mdi-magnify", text: "Archives", tooltip: "Search for archived URLs." },
-        { to: "/sheets", icon: "mdi-table-large", text: "Sheets", tooltip: "Create, manage, and archive Google Sheets." }
+        { to: "/", icon: "mdi-table-large", text: "Sheets", tooltip: "Create, manage, and archive Google Sheets." },
+        { to: "/url", icon: "mdi-cloud-download-outline", text: "URL", tooltip: "Archive a single URL." },
+        { to: "/archives", icon: "mdi-magnify", text: "Archives", tooltip: "Search for archived URLs." },
       ]
     };
   },

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pane" fluid>
+  <v-container class="pane" fluid  v-if="!user || !user.active" >
     <v-row>
       <v-col>
         <v-alert color="orange" icon="mdi-information" v-if="user && !user.active">
@@ -17,7 +17,7 @@
               data.
             </v-alert>
             <p>
-              This tool can be used to archive digital content via single URL or Google Sheets, you can also <router-link to="/urls">search for archive content</router-link>.
+              This tool can be used to archive digital content via single URL or Google Sheets, you can also search for archived content.
             </p>
             <p v-if="!user || !user.active">
               To use this tool you need a Google account and <strong>permission from the Bellingcat team</strong>.
@@ -27,16 +27,18 @@
       </v-col>
     </v-row>
   </v-container>
-  <ArchiveUrl v-if="user?.active" />
+  <ArchiveSheet v-if="user?.active" />
+  <ManageSheets v-if="user?.active" />
 </template>
 
 <script>
-import ArchiveUrl from "@/components/ArchiveUrl.vue";
+import ArchiveSheet from "@/components/ArchiveSheet.vue";
+import ManageSheets from "@/components/ManageSheets.vue";
 
 export default {
   name: "HomeView",
   components: {
-    ArchiveUrl
+    ArchiveSheet, ManageSheets
   },
   computed: {
     user() {

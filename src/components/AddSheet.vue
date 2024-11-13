@@ -25,9 +25,9 @@
 				size="large">
 				open sheet
 			</v-btn>
-			<v-btn v-if="actionIsCreate" color="primary" size="large" :disabled="!requiredData"
+			<v-btn v-if="actionIsCreate" color="teal" size="large" :disabled="!requiredData"
 				@click="createSheet">Create</v-btn>
-			<v-btn v-if="!actionIsCreate" color="primary" size="large" :disabled="!requiredDataExisting"
+			<v-btn v-if="!actionIsCreate" color="teal" size="large" :disabled="!requiredDataExisting"
 				@click="addExistingSheet">Add Existing Sheet</v-btn>
 		</v-col>
 
@@ -57,9 +57,6 @@ export default {
 			snackbarMessage: "",
 			snackbarColor: "red",
 			loading: false,
-
-			tab: '',
-			items: ['Create new Archiver Sheet', 'Add existing Sheets'],
 
 			sheetName: ``.trim(),
 			sheetUrlId: ``,
@@ -109,8 +106,7 @@ export default {
 
 			this.loading = true;
 			this.newSheetId = "";
-			this.$store.dispatch("add", this.sheetName).then((res) => {
-				console.log(res);
+			this.$store.dispatch("createSheet", this.sheetName).then((res) => {
 				if (!res.success) throw new Error(res.result);
 				this.newSheetId = res.result;
 				this.addSheetToAPI(this.newSheetId);

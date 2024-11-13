@@ -5,17 +5,7 @@ import {
   GoogleAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  limit,
-  getDocs,
-  doc,
-  deleteDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, } from "firebase/firestore";
 import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
 
 function saveToLocalStorage(state) {
@@ -33,6 +23,7 @@ function clearLocalStorage() {
   localStorage.removeItem("user");
   localStorage.removeItem("access_token");
 }
+
 async function waitForGapiAuth2() {
   return new Promise((resolve, reject) => {
     const checkGapiAuth2 = () => {
@@ -51,7 +42,7 @@ export default createStore({
     user: null,
     active: false,
     access_token: null,
-    docs: [],
+    sheets: [],
     loading: false,
     errorMessage: "",
     // API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
@@ -69,8 +60,8 @@ export default createStore({
       state.user.groups = groups;
       saveToLocalStorage(state);
     },
-    setDocs(state, docs) {
-      state.docs = docs;
+    setSheets(state, sheets) {
+      state.sheets = sheets;
     },
     setLoading(state, loading) {
       state.loading = loading;
@@ -95,7 +86,7 @@ export default createStore({
         commit("setUser", response.user);
         dispatch("checkActiveUser");
         dispatch("checkUserGroups");
-        dispatch("getDocs");
+        dispatch("getSheets");
       }
 
       commit("setUser", null);
@@ -126,7 +117,7 @@ export default createStore({
 
         // clean user from store and local storage
         commit("setUser", null);
-        commit("setDocs", []);
+        commit("setSheets", []);
         clearLocalStorage();
       } catch (error) {
         console.error("signOutUser (firebase/auth.js): ", error);
@@ -175,71 +166,35 @@ export default createStore({
       }
     },
 
-    async getDocs({ state, commit }) {
-      if (!state.user || !state.user.active) {
-        return;
-      }
+    async getSheets({ state, commit }) {
       try {
-        // get documents where uid matches user
+        commit("setLoading", true);
+        commit("setErrorMessage", "");
+        if(state.user?.active === false) return;
 
-        const q = query(
-          collection(firebaseFirestore, "sheets"),
-          where("uid", "==", state.user.uid)
-        );
-
-        const response = await getDocs(q);
-
-        const docs = response.docs.map((d) => ({ id: d.id, ...d.data() }));
-        commit("setDocs", docs);
-        commit("setLoading", false);
-      } catch (error) {
-        console.error("getDocs (firebase.js): ", error);
-      }
-    },
-
-    async removeDoc({ dispatch }, id) {
-      try {
-        await deleteDoc(doc(firebaseFirestore, "sheets", id));
-
-        dispatch("getDocs");
-      } catch (error) {
-        console.error("removeDocs (firebase.js): ", error);
-      }
-    },
-
-    async archive({ state, dispatch }, sheet) {
-      try {
-        // send a post request to the API with the sheet ID in the body
-        // and a bearer auth token in the header
-        await fetch(
-          `${state.API_ENDPOINT}/sheet`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${state.access_token}`,
-            },
-            body: JSON.stringify({
-              sheet_id: sheet.sheetId,
-            }),
+        fetch(`${state.API_ENDPOINT}/sheet/mine`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${state.access_token}`,
           }
-        );
-
-        // update firestore with the archive status
-        const docRef = doc(firebaseFirestore, "sheets", sheet.id);
-
-        await updateDoc(docRef, {
-          lastArchived: Date.now(),
+        }).then(async response => {
+          const res = await response.json();
+          if (response.status === 200) {
+            commit("setSheets", res);
+          } else {
+            throw new Error(JSON.stringify(res));
+          }
+        }).finally(() => {
+          commit("setLoading", false);
         });
 
-        // update the store
-        dispatch("getDocs");
       } catch (error) {
-        console.error("archive (firebase.js): ", error);
+        console.error("getSheets (firebase.js): ", error);
       }
-    },
 
-    async add({ state, dispatch, commit }, name) {
+    },
+    async createSheet({ state, dispatch, commit }, name) {
       commit("setLoading", true);
 
       return new Promise(async (resolve, reject) => {
@@ -391,49 +346,6 @@ export default createStore({
         commit("setLoading", false);
       });
     },
-
-    async enable({ state, dispatch, commit }, { spreadsheetId }) {
-      commit("setLoading", true);
-      commit("setErrorMessage", "");
-
-      try {
-        // fetch existing sheet
-        console.log(spreadsheetId);
-        const sheetToEnable = await gapi.client.sheets.spreadsheets.get({
-          spreadsheetId: spreadsheetId,
-        });
-        console.log(sheetToEnable);
-
-        const q = query(
-          collection(firebaseFirestore, "sheets"),
-          where("uid", "==", state.user.uid),
-          where("sheetId", "==", spreadsheetId),
-          limit(1)
-        );
-
-        const response = await getDocs(q);
-        if (response.docs.length > 0) {
-          throw "Sheet already enabled";
-        }
-
-        const col = await collection(firebaseFirestore, "sheets");
-        await addDoc(col, {
-          sheetId: spreadsheetId,
-          url: sheetToEnable.result.spreadsheetUrl,
-          timestamp: Date.now(),
-          uid: state.user.uid,
-          email: state.user.email,
-          lastArchived: null,
-          name: sheetToEnable.result.properties.title,
-        });
-
-        dispatch("getDocs");
-      } catch (error) {
-        commit("setErrorMessage", `Unable to add sheet: ${JSON.stringify(error)}`);
-        commit("setLoading", false);
-        console.error("add (firebase.js): ", error);
-      }
-    },
   },
   getters: {
     isTokenExpired: async (state) => {
@@ -469,7 +381,7 @@ export default createStore({
             //TODO: merge these into single endpoint in the future
             store.dispatch("checkActiveUser");
             store.dispatch("checkUserGroups");
-            store.dispatch("getDocs");
+            store.dispatch("getSheets");
           }
         }).catch((error) => {
           console.error("Error checking token expiration:", error);

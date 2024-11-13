@@ -1,12 +1,8 @@
 <template>
   <v-container class="pane">
-    <v-card class="pa-3">
+    <v-card class="pa-0">
 
-      <v-card-title class="text-center">
-        Archive Google Spreadsheets
-      </v-card-title>
-
-      <v-tabs v-model="tab" bg-color="green-lighten-4" grow class="elevation-1 rounded">
+      <v-tabs v-model="tab" bg-color="teal" grow class="elevation-1">
         <v-tab v-for="item in items" :key="item" :text="item" :value="item"></v-tab>
       </v-tabs>
 
@@ -97,45 +93,8 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </v-card>
-
   </v-container>
 
-  <v-container class="pane-l">
-    <v-card>
-      <v-card-title class="text-center">
-        <h4>Your Sheets</h4>
-      </v-card-title>
-
-      <v-table>
-        <thead>
-          <tr>
-            <th class="text-left">Sheet Name</th>
-            <th class="text-left">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Sheet 1</td>
-            <td>
-              <v-btn color="primary" @click="archiveSheet('Sheet 1')">Archive</v-btn>
-            </td>
-          </tr>
-          <tr>
-            <td>Sheet 2</td>
-            <td>
-              <v-btn color="primary" @click="archiveSheet('Sheet 2')">Archive</v-btn>
-            </td>
-          </tr>
-          <tr>
-            <td>Sheet 3</td>
-            <td>
-              <v-btn color="primary" @click="archiveSheet('Sheet 3')">Archive</v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-card>
-  </v-container>
 </template>
 
 <script>
@@ -149,7 +108,7 @@ export default {
   data() {
     return {
       tab: '',
-      items: ['Create new Archiver Sheet', 'Add existing Sheets'],
+      items: ['Create new Archiver Sheet', 'Add existing Sheet'],
     };
   },
   computed: {
