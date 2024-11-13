@@ -19,7 +19,7 @@ export default {
 		},
 		timeout: {
 			type: Number,
-			default: 3000
+			default: 5000
 		},
 		color: {
 			type: String,

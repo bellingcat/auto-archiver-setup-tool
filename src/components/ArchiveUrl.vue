@@ -1,6 +1,6 @@
 <template>
   <v-container class="pane">
-    <v-card :loading="loadingGroups || loadingArchive">
+    <v-card :loading="loadingArchive">
       <v-card-title class="text-center">
         Archive a single URL
       </v-card-title>
@@ -16,12 +16,12 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="4">
-            <v-select v-show="!public && groupsLoaded" v-model="group" label="Group" :items="availableGroups"
-              density="compact" :disabled="!groupsLoaded"></v-select>
+            <v-select v-show="!public" v-model="group" label="Group" :items="availableGroups"
+              density="compact"></v-select>
           </v-col>
           <v-col cols="12" md="4" class="text-right">
             <v-btn @click="archiveUrl" color="primary"
-              :disabled="!validUrl || loadingGroups || loadingArchive || (!public && group == -1)">
+              :disabled="!validUrl || loadingArchive || (!public && group == -1)">
               Archive
             </v-btn>
           </v-col>
@@ -64,13 +64,11 @@ export default {
   },
   data() {
     return {
-      loadingGroups: false,
-      groupsLoaded: false,
-      availableGroups: [],
+      availableGroups: [{ title: "only me", value: "" }].concat((this.$store.state.user?.groups || []).map(g => ({ title: g, value: g }))),
 
-      url: "https://t.me/cnn_world_news/34794",
+      url: "",
       public: true,
-      group: -1,
+      group: "",
       loadingArchive: false,
 
       taskId: null,
@@ -94,9 +92,9 @@ export default {
     },
   },
   watch: {
-    public(val) {
-      if (!val) this.loadGroups();
-    },
+    // public(val) {
+    //   if (!val) this.loadGroups();
+    // },
     url(val) {
       this.archiveResult = null;
       this.archiveFailure = null;
@@ -110,7 +108,7 @@ export default {
       this.snackbar = true;
     },
     archiveUrl() {
-      if (this.loadingGroups || this.loadingArchive) return;
+      if (this.loadingArchive) return;
       this.loadingArchive = true;
       this.archiveResult = null;
       this.archiveFailure = null;
@@ -142,8 +140,9 @@ export default {
         .catch(error => {
           console.error("/archive ", error);
           this.showSnackbar(`Unable to archive URL: ${error.message}`);
+        }).finally(() => {
           this.loadingArchive = false;
-        })
+        });
     },
     pollForArchiveResults() {
       this.loadingArchive = true;
@@ -178,34 +177,6 @@ export default {
           });
       };
       poll();
-    },
-    loadGroups() {
-      if (this.groupsLoaded) return;
-      this.loadingGroups = true;
-
-      fetch(`${this.$store.state.API_ENDPOINT}/groups`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.$store.state.access_token}`,
-        }
-      })
-        .then(response => response.json())
-        .then(items => {
-          if (!Array.isArray(items)) {
-            throw (`Unexpected response format from API`);
-          }
-          this.availableGroups = [{ title: "only me", value: "" }].concat(items.map(g => ({ title: g, value: g })));
-          this.group = this.availableGroups[0].value;
-          this.groupsLoaded = true;
-        })
-        .catch(error => {
-          console.error("/groups ", error);
-          this.showSnackbar(`Unable to fetch groups: ${error}`);
-        })
-        .finally(() => {
-          this.loadingGroups = false;
-        });
     },
   },
 };

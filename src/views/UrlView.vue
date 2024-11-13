@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-card elevation="12">
-          <v-card-title>
+          <v-card-title class="text-center my-3">
             Search archives by URL
             TODO: toggle between all/and my latest
           </v-card-title>

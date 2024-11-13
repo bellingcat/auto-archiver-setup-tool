@@ -54,11 +54,11 @@ export default {
 }
 
 .bg {
-  background-color: #d6e8de !important;
+  background-color: #b2dfdb !important;
 }
 
 html {
-  background-color: #d6e8de;
+  background-color: #b2dfdb;
 }
 
 .legal a {
