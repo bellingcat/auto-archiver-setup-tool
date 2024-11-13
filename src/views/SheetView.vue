@@ -1,11 +1,12 @@
 <template>
+  <ArchiveSheet v-if="user?.active" />
   <v-container class="pane">
     <v-row>
       <v-col>
         <v-card style="margin-bottom: 1em">
           <v-card-text>
             <v-alert color="#f2d97c" icon="mdi-alert">
-              This is a pre-release prototype demo service provided on a
+              This is still a pre-release prototype demo service provided on a
               best-effort basis. Do not use for mission critical or sensitive
               data.
             </v-alert>
@@ -161,11 +162,12 @@
 
 <script>
 import DocList from "@/components/DocList.vue";
+import ArchiveSheet from "@/components/ArchiveSheet.vue";
 
 export default {
   name: "SheetView",
   components: {
-    DocList,
+    DocList, ArchiveSheet
   },
   data() {
     return {

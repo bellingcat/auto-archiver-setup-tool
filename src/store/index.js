@@ -54,7 +54,8 @@ export default createStore({
     docs: [],
     loading: false,
     errorMessage: "",
-    API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
+    // API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
+    API_ENDPOINT: "http://localhost:8004"
   },
   mutations: {
     setUser(state, user) {
@@ -63,6 +64,10 @@ export default createStore({
     },
     setUserActiveState(state, active) {
       state.user.active = active;
+    },
+    setUserGroups(state, groups) {
+      state.user.groups = groups;
+      saveToLocalStorage(state);
     },
     setDocs(state, docs) {
       state.docs = docs;
@@ -89,6 +94,7 @@ export default createStore({
 
         commit("setUser", response.user);
         dispatch("checkActiveUser");
+        dispatch("checkUserGroups");
         dispatch("getDocs");
       }
 
@@ -145,6 +151,27 @@ export default createStore({
       } catch (error) {
         console.error("checkActiveUser (firebase.js): ", error);
         commit("setErrorMessage", "Unable to check user status against the API");
+      }
+    },
+
+    async checkUserGroups({ state, commit }) {
+      try {
+        commit("setErrorMessage", "");
+        const r = await fetch(
+          `${state.API_ENDPOINT}/groups`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${state.access_token}`,
+            },
+          }
+        );
+        const response = await r.json();
+        commit("setUserGroups", response);
+      } catch (error) {
+        console.error("checkUserGroups (firebase.js): ", error);
+        commit("setErrorMessage", "Unable to fetch user groups from the API");
       }
     },
 
@@ -212,174 +239,157 @@ export default createStore({
       }
     },
 
-    async add({ state, dispatch, commit }, { name }) {
+    async add({ state, dispatch, commit }, name) {
       commit("setLoading", true);
 
-      try {
-        // create new sheet
-        const newSheet = await gapi.client.sheets.spreadsheets.create({
-          properties: {
-            title: name,
-          },
-        });
+      return new Promise(async (resolve, reject) => {
+        try {
+          // create new sheet
+          const newSheet = await gapi.client.sheets.spreadsheets.create({
+            properties: {
+              title: name,
+            },
+          });
 
-        const spreadsheetId = newSheet.result.spreadsheetId;
+          const spreadsheetId = newSheet.result.spreadsheetId;
 
-        const userEnteredFormat = {
-          textFormat: {
-            bold: true,
-          },
-        };
+          const userEnteredFormat = {
+            textFormat: {
+              bold: true,
+            },
+          };
 
-        // add header row
-        await gapi.client.sheets.spreadsheets.batchUpdate(
-          {
-            spreadsheetId: spreadsheetId,
-          },
-          {
-            requests: [
-              {
-                updateCells: {
-                  rows: [
-                    {
-                      values: [
-                        {
-                          userEnteredValue: {
-                            stringValue: "Link",
+          // add header row
+          await gapi.client.sheets.spreadsheets.batchUpdate(
+            {
+              spreadsheetId: spreadsheetId,
+            },
+            {
+              requests: [
+                {
+                  updateCells: {
+                    rows: [
+                      {
+                        values: [
+                          {
+                            userEnteredValue: {
+                              stringValue: "Link",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Archive status",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Archive status",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-
-                        {
-                          userEnteredValue: {
-                            stringValue: "Destination folder",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Destination folder",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Archive location",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Archive location",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Archive date",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Archive date",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Thumbnail",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Thumbnail",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Upload timestamp",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Upload timestamp",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Upload title",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Upload title",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Textual content",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Textual content",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Screenshot",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Screenshot",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        {
-                          userEnteredValue: {
-                            stringValue: "Hash",
+                          {
+                            userEnteredValue: {
+                              stringValue: "Hash",
+                            },
+                            userEnteredFormat,
                           },
-                          userEnteredFormat,
-                        },
-                        // {
-                        //   userEnteredValue: {
-                        //     stringValue: "WACZ",
-                        //   },
-                        //   userEnteredFormat,
-                        // },
-                        // {
-                        //   userEnteredValue: {
-                        //     stringValue: "Replaywebpage",
-                        //   },
-                        //   userEnteredFormat,
-                        // },
-                      ],
-                    },
-                  ],
-                  fields:
-                    "userEnteredValue.stringValue,userEnteredFormat.textFormat.bold",
-                  start: {
-                    sheetId: 0,
-                    rowIndex: 0,
-                    columnIndex: 0,
-                  },
-                },
-              },
-              {
-                addProtectedRange: {
-                  protectedRange: {
-                    range: {
+                        ],
+                      },
+                    ],
+                    fields:
+                      "userEnteredValue.stringValue,userEnteredFormat.textFormat.bold",
+                    start: {
                       sheetId: 0,
-                      startRowIndex: 0,
-                      endRowIndex: 1,
-                      startColumnIndex: 0,
-                      endColumnIndex: 11,
+                      rowIndex: 0,
+                      columnIndex: 0,
                     },
-                    description:
-                      "Protecting header row (needed for auto-archiver), do not modify archiving column names, you can add and move columns around when no 'Archive in Progress' is present in the 'Archive status' column.",
-                    warningOnly: true,
                   },
                 },
-              },
-            ],
+                {
+                  addProtectedRange: {
+                    protectedRange: {
+                      range: {
+                        sheetId: 0,
+                        startRowIndex: 0,
+                        endRowIndex: 1,
+                        startColumnIndex: 0,
+                        endColumnIndex: 11,
+                      },
+                      description:
+                        "Protecting header row (needed for auto-archiver), do not modify archiving column names, you can add and move columns around when no 'Archive in Progress' is present in the 'Archive status' column.",
+                      warningOnly: true,
+                    },
+                  },
+                },
+              ],
+            }
+          );
+
+          // add permissions
+          await gapi.client.drive.permissions.create({
+            fileId: spreadsheetId,
+            resource: {
+              role: "writer",
+              type: "user",
+              emailAddress:
+                "bellingcat-auto-archiver-api@bellingcat-auto-archiver-b85db.iam.gserviceaccount.com",
+            },
+          });
+
+          resolve({ success: true, result: spreadsheetId });
+        } catch (error) {
+          console.error("add (firebase.js): ", error);
+          if (error.status === 401) {
+            await dispatch("signout");
           }
-        );
-
-        // add permissions
-        await gapi.client.drive.permissions.create({
-          fileId: spreadsheetId,
-          resource: {
-            role: "writer",
-            type: "user",
-            emailAddress:
-              "bellingcat-auto-archiver-api@bellingcat-auto-archiver-b85db.iam.gserviceaccount.com",
-          },
-        });
-
-        const col = await collection(firebaseFirestore, "sheets");
-        await addDoc(col, {
-          sheetId: spreadsheetId,
-          url: newSheet.result.spreadsheetUrl,
-          timestamp: Date.now(),
-          uid: state.user.uid,
-          email: state.user.email,
-          lastArchived: null,
-          name: name,
-        });
-
-        dispatch("getDocs");
-      } catch (error) {
-        console.error("add (firebase.js): ", error);
-      }
+          reject({ success: false, result: error });
+        }
+        commit("setLoading", false);
+      });
     },
 
     async enable({ state, dispatch, commit }, { spreadsheetId }) {
@@ -456,7 +466,9 @@ export default createStore({
           if (expired) {
             store.dispatch("signout");
           } else {
+            //TODO: merge these into single endpoint in the future
             store.dispatch("checkActiveUser");
+            store.dispatch("checkUserGroups");
             store.dispatch("getDocs");
           }
         }).catch((error) => {
