@@ -5,9 +5,10 @@
         <v-card elevation="12">
           <v-card-title class="text-center my-3">
             Search archives by URL
-            TODO: toggle between all/and my latest
           </v-card-title>
           <v-card-text>
+
+            <!-- TODO: toggle between all/and my latest, maybe with tabs like sheets -->
             <v-form>
               <v-row>
                 <v-col cols="12" md="6">
@@ -190,7 +191,7 @@ export default {
           }
         })
         .catch(error => {
-          console.error("/url/search ", error);
+          console.error("/url/search", error);
           this.snackbarMessage = `Error searching for archives: ${error}`;
           this.snackbar = true;
         })

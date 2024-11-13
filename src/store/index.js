@@ -86,7 +86,6 @@ export default createStore({
         commit("setUser", response.user);
         dispatch("checkActiveUser");
         dispatch("checkUserGroups");
-        dispatch("getSheets");
       }
 
       commit("setUser", null);
@@ -124,7 +123,7 @@ export default createStore({
       }
     },
 
-    async checkActiveUser({ state, commit }) {
+    async checkActiveUser({ state, dispatch, commit }) {
       try {
         commit("setErrorMessage", "");
         const r = await fetch(
@@ -139,6 +138,9 @@ export default createStore({
         );
         const response = await r.json();
         commit("setUserActiveState", response.active);
+        if (response.active === true) {
+          dispatch("getSheets");
+        }
       } catch (error) {
         console.error("checkActiveUser (firebase.js): ", error);
         commit("setErrorMessage", "Unable to check user status against the API");
@@ -170,7 +172,7 @@ export default createStore({
       try {
         commit("setLoading", true);
         commit("setErrorMessage", "");
-        if(state.user?.active === false) return;
+        if (state.user?.active === false) return;
 
         fetch(`${state.API_ENDPOINT}/sheet/mine`, {
           method: "GET",
@@ -381,7 +383,6 @@ export default createStore({
             //TODO: merge these into single endpoint in the future
             store.dispatch("checkActiveUser");
             store.dispatch("checkUserGroups");
-            store.dispatch("getSheets");
           }
         }).catch((error) => {
           console.error("Error checking token expiration:", error);

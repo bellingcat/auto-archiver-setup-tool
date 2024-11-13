@@ -1,13 +1,12 @@
 <template>
-  <v-container class="pane" fluid  v-if="!user || !user.active" >
+  <v-container class="pane" fluid v-if="!user || !user.active">
     <v-row>
       <v-col>
-        <v-alert color="orange" icon="mdi-information" v-if="user && !user.active">
-          To use this tool you need a Google account and <strong>permission from the Bellingcat team</strong>.<br />
-          You can do so HERE: TODO.
+        <v-alert color="orange" icon="mdi-information" v-if="user && !user.active" class="text-center" style="font-size:x-large">
+            To use this tool you need <strong>permission from Bellingcat's tech team</strong>. You can ask for access via <a href="https://forms.gle/crqBXUtyZcbLhiRQ9" target="_blank">this form</a>.
         </v-alert>
-        <v-card style="margin-bottom: 1em">
-          <v-card-text>
+        <v-card>
+            <v-card-text>
             <v-card-title class="text-center">
               Welcome to the Auto Archiver Setup Tool
             </v-card-title>
@@ -17,12 +16,13 @@
               data.
             </v-alert>
             <p>
-              This tool can be used to archive digital content via single URL or Google Sheets, you can also search for archived content.
+              This tool can be used to archive digital content via single URL or Google Sheets, you can also search for
+              archived content.
             </p>
-            <p v-if="!user || !user.active">
-              To use this tool you need a Google account and <strong>permission from the Bellingcat team</strong>.
-            </p>
-          </v-card-text>
+            <div class="text-center">
+              <v-btn v-if="!user" @click="$store.dispatch('signin')" size="large">Sign In</v-btn>
+            </div>
+            </v-card-text>
         </v-card>
       </v-col>
     </v-row>

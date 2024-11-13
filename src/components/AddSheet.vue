@@ -139,7 +139,7 @@ export default {
 				const j = await response.json();
 				if (response.status === 201) {
 					this.showSnackbar(`Sheet created successfully!`, "green");
-					// this.$store.dispatch("refreshDocs"); //TODO: implement this
+					this.$store.dispatch("getSheets");
 				} else {
 					throw new Error(JSON.stringify(j));
 				}
