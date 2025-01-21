@@ -242,12 +242,6 @@ export default createStore({
                           },
                           {
                             userEnteredValue: {
-                              stringValue: "Destination folder",
-                            },
-                            userEnteredFormat,
-                          },
-                          {
-                            userEnteredValue: {
                               stringValue: "Archive location",
                             },
                             userEnteredFormat,

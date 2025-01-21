@@ -4,30 +4,35 @@
 		<v-card class="pa-3">
 
 			<v-card-title class="text-center">
-				Your <span v-if="items">{{ items.length }}</span> Sheets
+				Your <u v-if="items">{{ items.length }}</u> active archiver sheets
 			</v-card-title>
 
 			<v-data-table :headers="headers" item-key="name" no-data-text="No Active Sheets available" :items="items"
 				:loading="loading" items-per-page="25" hover>
 				<template v-slot:item.actions="{ item: data }">
-					<v-btn color="green" size="small" icon class="mx-2" rounded
-						:href="`https://docs.google.com/spreadsheets/d/${data.id}`" :disabled="loading"
-						target="_blank"><v-icon>mdi-open-in-new</v-icon>
-						<v-tooltip activator="parent" location="left">Open in new tab</v-tooltip>
-					</v-btn>
-					<v-btn color="" size="small" icon class="mx-2" :disabled="loading" rounded
+					<v-btn color="teal-lighten-1" size="small" icon class="mx-2" :disabled="loading" rounded
 						@click="archiveSheetNow(data.id)"><v-icon>mdi-archive-outline</v-icon>
 
 						<v-tooltip activator="parent" location="left">Archive Now!</v-tooltip>
 					</v-btn>
-					<v-btn color="red-lighten-4" size="small" icon class="mx-2" :disabled="loading" rounded
+					<v-btn color="green-lighten-1" size="small" icon class="mx-2" rounded
+						:href="`https://docs.google.com/spreadsheets/d/${data.id}`" :disabled="loading"
+						target="_blank"><v-icon>mdi-open-in-new</v-icon>
+						<v-tooltip activator="parent" location="left">Open in new tab</v-tooltip>
+					</v-btn>
+					<v-btn color="red-lighten-2" size="small" icon class="mx-2" :disabled="loading" rounded
 						@click="removeSheet(data.id)"><v-icon>mdi-delete-outline</v-icon>
 						<v-tooltip activator="parent" location="left">Stop archiving, does not delete the spreadsheet
 							itself.</v-tooltip>
 					</v-btn>
 				</template>
 				<template v-slot:item.name="{ item: data }">
-					<span :title="data.id">{{ data.name }}</span>
+					<strong :title="data.id">{{ data.name }}</strong>
+				</template>
+				<template v-slot:item.frequency="{ item: data }">
+					<v-chip :color="data.frequency=='daily'?'teal-darken-3':'orange-darken-3'" class="bg-white" prepend-icon="mdi-archive-clock-outline" variant="outlined">
+						{{ data.frequency }}
+					</v-chip>
 				</template>
 			</v-data-table>
 		</v-card>
