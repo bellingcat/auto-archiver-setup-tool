@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pane" v-if="user?.active" >
+  <v-container class="pane" v-if="user?.active">
     <v-card :loading="loadingArchive">
       <v-card-title class="text-center">
         Archive a single URL
@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="12" md="4" class="text-right">
             <v-btn @click="archiveUrl" color="teal"
-              :disabled="!validUrl || loadingArchive || (!public && group == -1)">
+              :disabled="!validUrl || loadingArchive || (!public && group == -1) || maxedOutMBs || maxedOutURLs">
               Archive
             </v-btn>
           </v-col>
@@ -41,10 +41,36 @@
             </v-alert>
             <p v-if="validUrl">
               You can <strong v-if="archiveFailure">still</strong> <router-link
-                :to="`/archives?url=${encodeURIComponent(url)}`" target="_blank"><v-icon>mdi-open-in-new</v-icon> search for
+                :to="`/archives?url=${encodeURIComponent(url)}`" target="_blank"><v-icon>mdi-open-in-new</v-icon> search
+                for
                 archives</router-link> of
               this URL.
             </p>
+          </v-col>
+          <v-col cols="12" sm="12" class="pt-0">
+            <span>
+              Quota and rules<span v-if="group != ''"> for group <code>{{ group }}</code></span>:
+              <ul>
+                <li>
+                  Monthly URLs: <strong>{{ groupUsage.monthly_urls || 0 }}</strong>
+                  out of
+                  <strong>{{ displayPermissionValue(groupPermissions?.max_monthly_urls, " URLs") }}</strong>
+                  <v-chip v-if="maxedOutURLs" label class="ml-2" color="red" density="comfortable" size="small">maxed
+                    out</v-chip>
+                </li>
+                <li>
+                  Monthly MBs:
+                  <strong>{{ groupUsage.monthly_mbs || 0 }}</strong>
+                  out of
+                  <strong>{{ displayPermissionValue(groupPermissions?.max_monthly_mbs, " MBs") }}</strong>
+                  <v-chip v-if="maxedOutMBs" label class="ml-2" color="red" density="comfortable" size="small">maxed
+                    out</v-chip>
+                </li>
+                <li>How long will we store these archives: <strong>{{
+                  displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
+                </li>
+              </ul>
+            </span>
           </v-col>
         </v-row>
       </v-card-text>
@@ -92,6 +118,29 @@ export default {
     },
     validUrl() {
       return this.url && this.urlValidator(this.url) === true;
+    },
+    globalUsage() {
+      return this.$store.state.user?.usage || {};
+    },
+    groupUsage() {
+      if (this.group == "") {
+        return this.$store.state.user?.usage || {};
+      }
+      return this.$store.state.user?.usage?.["groups"]?.[this.group] || {};
+    },
+    groupPermissions() {
+      if (this.group == "") {
+        return this.$store.state.user?.permissions?.["all"] || {};
+      }
+      return this.$store.state.user?.permissions?.[this.group] || {};
+    },
+    maxedOutMBs() {
+      if (this.groupPermissions.max_monthly_mbs === -1) return false;
+      return this.groupUsage.monthly_mbs >= this.groupPermissions.max_monthly_mbs;
+    },
+    maxedOutURLs() {
+      if (this.groupPermissions.max_monthly_urls === -1) return false;
+      return this.groupUsage.monthly_urls >= this.groupPermissions.max_monthly_urls;
     },
   },
   watch: {
@@ -178,6 +227,10 @@ export default {
       };
       poll();
     },
+    displayPermissionValue(value, extraWord) {
+      if (value === undefined) { return "not set"; }
+      return value == -1 ? "no limit" : value + extraWord;
+    }
   },
 };
 </script>

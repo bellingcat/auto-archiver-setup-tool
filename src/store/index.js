@@ -45,6 +45,7 @@ export default createStore({
     sheets: [],
     loading: false,
     errorMessage: "",
+    // # TODO: reenable production API endpoint
     // API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
     API_ENDPOINT: "http://localhost:8004"
   },
@@ -56,8 +57,13 @@ export default createStore({
     setUserActiveState(state, active) {
       state.user.active = active;
     },
-    setUserGroups(state, groups) {
-      state.user.groups = groups;
+    setUserPermissions(state, permissions) {
+      state.user.permissions = permissions;
+      state.user.groups = Object.keys(permissions).filter(key => key !== "all");
+      saveToLocalStorage(state);
+    },
+    setUserUsage(state, usage) {
+      state.user.usage = usage;
       saveToLocalStorage(state);
     },
     setSheets(state, sheets) {
@@ -85,7 +91,8 @@ export default createStore({
 
         commit("setUser", response.user);
         dispatch("checkActiveUser");
-        dispatch("checkUserGroups");
+        dispatch("checkUserPermissions");
+        dispatch("checkUserUsage");
       }
 
       commit("setUser", null);
@@ -147,11 +154,11 @@ export default createStore({
       }
     },
 
-    async checkUserGroups({ state, commit }) {
+    async checkUserPermissions({ state, commit }) {
       try {
         commit("setErrorMessage", "");
         const r = await fetch(
-          `${state.API_ENDPOINT}/groups`,
+          `${state.API_ENDPOINT}/user/permissions`,
           {
             method: "GET",
             headers: {
@@ -161,10 +168,30 @@ export default createStore({
           }
         );
         const response = await r.json();
-        commit("setUserGroups", response);
+        commit("setUserPermissions", response);
       } catch (error) {
-        console.error("checkUserGroups (firebase.js): ", error);
-        commit("setErrorMessage", "Unable to fetch user groups from the API");
+        console.error("checkUserPermissions (firebase.js): ", error);
+        commit("setErrorMessage", "Unable to fetch user permissions from the API");
+      }
+    },
+    async checkUserUsage({ state, commit }) {
+      try {
+        commit("setErrorMessage", "");
+        const r = await fetch(
+          `${state.API_ENDPOINT}/user/usage`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${state.access_token}`,
+            },
+          }
+        );
+        const response = await r.json();
+        commit("setUserUsage", response);
+      } catch (error) {
+        console.error("checkUserUsage (firebase.js): ", error);
+        commit("setErrorMessage", "Unable to fetch user usage quota from the API");
       }
     },
 
@@ -376,7 +403,8 @@ export default createStore({
           } else {
             //TODO: merge these into single endpoint in the future
             store.dispatch("checkActiveUser");
-            store.dispatch("checkUserGroups");
+            store.dispatch("checkUserPermissions");
+            store.dispatch("checkUserUsage");
           }
         }).catch((error) => {
           console.error("Error checking token expiration:", error);

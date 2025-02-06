@@ -10,7 +10,7 @@
 			<v-data-table :headers="headers" item-key="name" no-data-text="No Active Sheets available" :items="items"
 				:loading="loading" items-per-page="25" hover>
 				<template v-slot:item.actions="{ item: data }">
-					<v-btn color="teal-lighten-1" size="small" icon class="mx-2" :disabled="loading" rounded
+					<v-btn :disabled="!canArchiveNow(data.group_id) || loading" color="teal-lighten-1" size="small" icon class="mx-2" rounded
 						@click="archiveSheetNow(data.id)"><v-icon>mdi-archive-outline</v-icon>
 
 						<v-tooltip activator="parent" location="left">Archive Now!</v-tooltip>
@@ -21,7 +21,7 @@
 						<v-tooltip activator="parent" location="left">Open in new tab</v-tooltip>
 					</v-btn>
 					<v-btn color="red-lighten-2" size="small" icon class="mx-2" :disabled="loading" rounded
-						@click="removeSheet(data.id)"><v-icon>mdi-delete-outline</v-icon>
+						@click="removeSheet(data.id)"><v-icon>mdi-stop</v-icon>
 						<v-tooltip activator="parent" location="left">Stop archiving, does not delete the spreadsheet
 							itself.</v-tooltip>
 					</v-btn>
@@ -30,7 +30,8 @@
 					<strong :title="data.id">{{ data.name }}</strong>
 				</template>
 				<template v-slot:item.frequency="{ item: data }">
-					<v-chip :color="data.frequency=='daily'?'teal-darken-3':'orange-darken-3'" class="bg-white" prepend-icon="mdi-archive-clock-outline" variant="outlined">
+					<v-chip :color="data.frequency == 'daily' ? 'teal-darken-3' : 'orange-darken-3'" class="bg-white"
+						prepend-icon="mdi-archive-clock-outline" variant="outlined">
 						{{ data.frequency }}
 					</v-chip>
 				</template>
@@ -63,7 +64,7 @@ export default {
 				{ title: "Group", value: "group_id", sortable: true },
 				{ title: "Frequency", value: "frequency", sortable: true },
 				{ title: "Created", value: "created_at", sortable: true },
-				{ title: "Last Archived", value: "last_archived_at", sortable: true },
+				{ title: "Last URL Archived", value: "last_url_archived_at", sortable: true },
 				{ title: 'Actions', value: "actions", align: 'center' },
 			],
 
@@ -82,6 +83,9 @@ export default {
 			this.snackbarMessage = message;
 			this.snackbarColor = color;
 			this.snackbar = true;
+		},
+		canArchiveNow(group_id) {
+			return this.$store.state.user?.permissions?.[group_id]?.manually_trigger_sheet || false;
 		},
 		archiveSheetNow(sheetId) {
 			this.loading = true;
@@ -119,6 +123,7 @@ export default {
 				if (response.status === 200 && res.deleted) {
 					this.showSnackbar(`Sheet ${sheetId} has been removed!`, "green");
 					this.$store.dispatch("getSheets");
+					this.$store.dispatch("checkUserUsage");
 				} else {
 					throw new Error(JSON.stringify(res));
 				}

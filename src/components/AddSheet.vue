@@ -12,8 +12,8 @@
 			<v-select v-model="group" label="Group" :items="availableGroups" required density="comfortable"></v-select>
 		</v-col>
 		<v-col cols="6" sm="6" class="ma-0 py-0">
-			<v-select v-model="frequency" label="Archive frequency" :items="availableFrequencies" required
-				density="comfortable"></v-select>
+			<v-select v-model="frequency" label="Archive frequency" :items="availableFrequencies"
+				:disabled="!availableFrequencies?.length" required density="comfortable"></v-select>
 		</v-col>
 		<v-col cols="12" sm="12" class="text-right pt-0">
 			<small v-if="spreadsheetId">Detected Spreadsheet id: <code>{{ spreadsheetId }}</code></small>
@@ -30,6 +30,28 @@
 			<v-btn v-if="!actionIsCreate" color="teal" size="large" :disabled="!requiredDataExisting"
 				@click="addExistingSheet">Add Existing Sheet</v-btn>
 		</v-col>
+		<v-col cols="12" sm="12" class="pt-0" v-if="group != 'please select'">
+			<span>
+				Quota and rules for group <code>{{ group }}</code>:
+				<ul>
+					<li>
+						Active sheets: 
+						<strong>{{ groupUsage.total_sheets || 0 }}</strong> out of 
+						<strong>{{ displayPermissionValue(groupPermissions?.max_sheets, "")}}</strong>
+						<v-chip v-if="maxedOutGroupQuota" label class="ml-2" color="red" density="comfortable" size="small">maxed out</v-chip>
+					</li>
+					<li>Monthly URLs: <strong>{{ groupUsage.monthly_urls || 0 }}</strong> out of <strong>{{
+						displayPermissionValue(groupPermissions?.max_monthly_urls, " URLs") }}</strong></li>
+					<li>Monthly MBs: <strong>{{ groupUsage.monthly_mbs || 0 }}</strong> out of <strong>{{
+						displayPermissionValue(groupPermissions?.max_monthly_mbs, " MBs") }}</strong></li>
+					<li>How long will we store these archives: <strong>{{
+						displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
+					</li>
+					<li>You <strong>{{ groupPermissions?.manually_trigger_sheet?"can":"cannot" }}</strong> manually trigger sheeets in this group. </li>
+				</ul>
+			</span>
+		</v-col>
+
 
 	</v-row>
 
@@ -63,8 +85,7 @@ export default {
 
 			group: "please select",
 
-			availableFrequencies: ["daily", "hourly"].map(f => ({ title: f, value: f })),
-			frequency: "daily",
+			frequency: "please select group",
 
 			newSheetId: "",
 		};
@@ -74,13 +95,26 @@ export default {
 			return this.$store.state.user;
 		},
 		requiredData() {
-			return this.sheetName && this.availableGroups?.some(g => g.value === this.group) && this.availableFrequencies?.some(f => f.value === this.frequency);
+			return this.sheetName && this.availableGroups?.some(g => g.value === this.group) && this.availableFrequencies?.some(f => f === this.frequency) && !this.maxedOutGroupQuota;
 		},
 		requiredDataExisting() {
-			return this.sheetName && this.spreadsheetId && this.availableGroups?.some(g => g.value === this.group) && this.availableFrequencies?.some(f => f.value === this.frequency);
+			return this.sheetName && this.spreadsheetId && this.availableGroups?.some(g => g.value === this.group) && this.availableFrequencies?.some(f => f === this.frequency) && !this.maxedOutGroupQuota;
 		},
 		availableGroups() {
 			return (this.$store.state.user?.groups || []).map(g => ({ title: g, value: g }));
+		},
+		availableFrequencies() {
+			return this.$store.state.user?.permissions?.[this.group]?.sheet_frequency || [];
+		},
+		groupPermissions() {
+			return this.$store.state.user?.permissions?.[this.group] || {};
+		},
+		groupUsage() {
+			return this.$store.state.user?.usage?.["groups"]?.[this.group] || {};
+		},
+		maxedOutGroupQuota(){
+			if (this.groupPermissions.max_sheets === -1) return false;
+			return this.groupUsage.total_sheets >= this.groupPermissions.max_sheets;
 		},
 		spreadsheetId() {
 			if (
@@ -107,6 +141,7 @@ export default {
 			this.loading = true;
 			this.newSheetId = "";
 			this.$store.dispatch("createSheet", this.sheetName).then((res) => {
+				this.$store.dispatch("checkUserUsage");
 				if (!res.success) throw new Error(res.result);
 				this.newSheetId = res.result;
 				this.addSheetToAPI(this.newSheetId);
@@ -140,6 +175,7 @@ export default {
 				if (response.status === 201) {
 					this.showSnackbar(`Sheet created successfully!`, "green");
 					this.$store.dispatch("getSheets");
+					this.$store.dispatch("checkUserUsage");
 				} else {
 					throw new Error(JSON.stringify(j));
 				}
@@ -152,6 +188,10 @@ export default {
 				this.sheetUrlId = "";
 				this.group = "please select";
 			});
+		},
+		displayPermissionValue(value, extraWord) {
+			if (value === undefined) { return "not set"; }
+			return value == -1 ? "no limit" : value + extraWord;
 		}
 	},
 };

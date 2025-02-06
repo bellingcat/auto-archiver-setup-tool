@@ -4,7 +4,7 @@
     <v-main>
       <router-view />
     </v-main>
-    <v-footer class="text-center">
+    <v-footer class="text-center py-6">
       <v-row>
         <v-col cols="12">
           <div class="legal py-2">
@@ -13,13 +13,14 @@
           </div>
         </v-col>
         <v-col cols="12">
-          This tool uses <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a> to
-          archive online content. 
-          <br/>For more information see
-          <a href="https://github.com/bellingcat/auto-archiver">our Github repository</a>
-          and the <a
+          You can deploy your own version of this tool by hosting the <a href="https://github.com/bellingcat/auto-archiver-api">API</a> and the <a href="https://github.com/bellingcat/auto-archiver-api">UI</a>.
+          <br/>
+          This tool uses <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a> under the hood to archive online content.
+          <br/>
+          For more information about it see <a
             href="https://www.bellingcat.com/resources/2022/09/22/preserve-vital-online-content-with-bellingcats-auto-archiver-tool/">associated
             article</a>.
+          
         </v-col>
       </v-row>
 
@@ -70,10 +71,13 @@ html {
   padding: 0.2em 0.4em;
 }
 
-footer, .v-footer, .v-footer div {
+footer,
+.v-footer,
+.v-footer div {
   margin: 0px;
   padding: 0px;
 }
+
 .v-footer {
   max-height: 125px;
 }

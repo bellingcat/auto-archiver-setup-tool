@@ -7,8 +7,6 @@
             Search archives by URL
           </v-card-title>
           <v-card-text>
-
-            <!-- TODO: toggle between all/and my latest, maybe with tabs like sheets -->
             <v-form>
               <v-row>
                 <v-col cols="12" md="6">
