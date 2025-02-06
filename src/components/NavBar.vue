@@ -24,7 +24,7 @@
 
     <v-spacer v-if="!smAndDown"></v-spacer>
     <span class="user mx-2 pa-2 bg-blue-grey-lighten-5 rounded elevation-2" v-if="user">
-      <span>
+      <span v-if="!loadingUserState">
         <v-chip v-if="user.active" color="green" class="bg-white" prepend-icon="mdi-checkbox-marked-circle"
           variant="outlined">
           active
@@ -88,7 +88,10 @@ export default {
         return "This account has access to at least one feature.";
       }
       return "This account is inactive, please reach out to the Bellingcat team for access.";
-    }
+    },
+		loadingUserState() {
+			return this.$store.state?.loadingUserState;
+		}
   },
 };
 </script>

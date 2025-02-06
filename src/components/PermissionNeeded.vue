@@ -1,5 +1,5 @@
 <template>
-	<v-alert color="orange" icon="mdi-information" class="text-center" style="font-size:x-large">
+	<v-alert v-if="!loadingUserState" color="orange" icon="mdi-information" class="text-center" style="font-size:x-large">
 		To use the <strong>{{ feature }}</strong> feature, you need <strong>permission from Bellingcat's tech
 			team</strong>.
 		<br />
@@ -18,6 +18,11 @@ export default {
 		feature: {
 			type: String,
 			required: false
+		}
+	},
+	computed: {
+		loadingUserState() {
+			return this.$store.state?.loadingUserState;
 		}
 	}
 }

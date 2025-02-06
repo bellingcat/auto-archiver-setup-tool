@@ -43,7 +43,7 @@ export default createStore({
     active: false,
     access_token: null,
     sheets: [],
-    loading: false,
+    loadingUserState: false,
     errorMessage: "",
     // # TODO: reenable production API endpoint
     // API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
@@ -56,6 +56,7 @@ export default createStore({
     },
     setUserActiveState(state, active) {
       state.user.active = active;
+      state.loadingUserState = false;
     },
     setUserPermissions(state, permissions) {
       state.user.permissions = permissions;
@@ -67,8 +68,8 @@ export default createStore({
     setSheets(state, sheets) {
       state.sheets = sheets;
     },
-    setLoading(state, loading) {
-      state.loading = loading;
+    setLoadingUserState(state, loadingUserState) {
+      state.loadingUserState = loadingUserState;
     },
     setAccessToken(state, access_token) {
       state.access_token = access_token;
@@ -87,6 +88,7 @@ export default createStore({
 
         const response = await signInWithCredential(firebaseAuth, credential);
 
+        commit("setLoadingUserState", true);
         commit("setUser", response.user);
         dispatch("checkActiveUser");
         dispatch("checkUserPermissions");
@@ -140,7 +142,7 @@ export default createStore({
               Authorization: `Bearer ${state.access_token}`,
             },
           }
-        );
+        )
         const response = await r.json();
         commit("setUserActiveState", response.active);
         if (response.active === true) {
@@ -195,7 +197,6 @@ export default createStore({
 
     async getSheets({ state, commit }) {
       try {
-        commit("setLoading", true);
         commit("setErrorMessage", "");
         if (state.user?.active === false) return;
 
@@ -212,8 +213,6 @@ export default createStore({
           } else {
             throw new Error(JSON.stringify(res));
           }
-        }).finally(() => {
-          commit("setLoading", false);
         });
 
       } catch (error) {
@@ -222,8 +221,6 @@ export default createStore({
 
     },
     async createSheet({ state, dispatch, commit }, name) {
-      commit("setLoading", true);
-
       return new Promise(async (resolve, reject) => {
         try {
           // create new sheet
@@ -364,7 +361,6 @@ export default createStore({
           }
           reject({ success: false, result: error });
         }
-        commit("setLoading", false);
       });
     },
   },
@@ -399,7 +395,6 @@ export default createStore({
           if (expired) {
             store.dispatch("signout");
           } else {
-            //TODO: merge these into single endpoint in the future
             store.dispatch("checkActiveUser");
             store.dispatch("checkUserPermissions");
             store.dispatch("checkUserUsage");
