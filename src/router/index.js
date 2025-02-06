@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
-import ArchivesView from '../views/ArchivesView.vue';
+import ArchiveSearchView from '../views/ArchiveSearchView.vue';
 
-import ArchiveUrl from "../components/ArchiveUrl.vue";
+import ArchiveUrlView from "../views/ArchiveUrlView.vue";
 
 const routes = [
   {
@@ -13,12 +13,12 @@ const routes = [
   {
     path: '/url',
     name: 'URL Archiving',
-    component: ArchiveUrl,
+    component: ArchiveUrlView,
   },
   {
     path: '/archives',
     name: 'Archives search',
-    component: ArchivesView,
+    component: ArchiveSearchView,
   },
   {
     path: '/privacy',

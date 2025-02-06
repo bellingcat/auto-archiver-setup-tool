@@ -60,11 +60,9 @@ export default createStore({
     setUserPermissions(state, permissions) {
       state.user.permissions = permissions;
       state.user.groups = Object.keys(permissions).filter(key => key !== "all");
-      saveToLocalStorage(state);
     },
     setUserUsage(state, usage) {
       state.user.usage = usage;
-      saveToLocalStorage(state);
     },
     setSheets(state, sheets) {
       state.sheets = sheets;

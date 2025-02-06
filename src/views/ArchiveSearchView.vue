@@ -1,5 +1,6 @@
 <template>
-  <v-container class="pane-l" v-if="user?.active">
+  <PermissionNeeded v-if="user && !featureEnabled" feature="Search Archives" />
+  <v-container class="pane-l" v-if="user?.active && featureEnabled">
     <v-row>
       <v-col>
         <v-card elevation="12">
@@ -100,9 +101,14 @@
 </template>
 
 <script>
+import PermissionNeeded from "@/components/PermissionNeeded.vue";
 import { urlValidator, getUrlFromResult } from "@/utils/misc.js";
+
 export default {
-  name: "ArchivesView",
+  name: "ArchiveSearchView",
+  components: {
+    PermissionNeeded
+  },
   data() {
     return {
       today: new Date().toISOString().substring(0, 10),
@@ -135,6 +141,16 @@ export default {
   computed: {
     user() {
       return this.$store.state.user;
+    },
+    featureEnabled() {
+      const read = this.user?.permissions?.['all']?.read
+      if (read === true) {
+        return true;
+      }
+      if (Array.isArray(read) && read.length > 0) {
+        return true;
+      }
+      return this.user?.permissions?.['all']?.read_public
     },
     validUrl() {
       return this.queryUrl && this.urlValidator(this.queryUrl) === true;

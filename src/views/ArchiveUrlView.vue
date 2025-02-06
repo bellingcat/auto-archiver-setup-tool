@@ -1,5 +1,6 @@
 <template>
-  <v-container class="pane" v-if="user?.active">
+  <PermissionNeeded v-if="user && !featureEnabled" feature="Archive URL" />
+  <v-container class="pane" v-if="user?.active && featureEnabled">
     <v-card :loading="loadingArchive">
       <v-card-title class="text-center">
         Archive a single URL
@@ -82,11 +83,12 @@
 <script>
 import { urlValidator, getUrlFromResult } from "@/utils/misc";
 import SnackBar from "@/components/SnackBar.vue";
+import PermissionNeeded from "@/components/PermissionNeeded.vue";
 
 export default {
-  name: "ArchiveUrl",
+  name: "ArchiveUrlView",
   components: {
-    SnackBar,
+    SnackBar, PermissionNeeded
   },
   data() {
     return {
@@ -109,6 +111,9 @@ export default {
   computed: {
     user() {
       return this.$store.state.user;
+    },
+    featureEnabled() {
+      return this.user?.permissions?.["all"]?.archive_url;
     },
     urlValidator() {
       return urlValidator;

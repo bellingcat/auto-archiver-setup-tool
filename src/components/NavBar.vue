@@ -85,7 +85,7 @@ export default {
     },
     activeUserMessage() {
       if (this.user && this.user.active) {
-        return "This account is active and can use the tool.";
+        return "This account has access to at least one feature.";
       }
       return "This account is inactive, please reach out to the Bellingcat team for access.";
     }
