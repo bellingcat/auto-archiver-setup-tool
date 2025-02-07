@@ -60,11 +60,11 @@ export default {
 			loading: false,
 
 			headers: [
-				{ title: "Sheet Name", value: "name", sortable: true },
+				{ title: "Name", value: "name", sortable: true },
 				{ title: "Group", value: "group_id", sortable: true },
-				{ title: "Frequency", value: "frequency", sortable: true },
+				{ title: "Archived", value: "frequency", sortable: true },
 				{ title: "Created", value: "created_at", sortable: true },
-				{ title: "Last URL Archived", value: "last_url_archived_at", sortable: true },
+				{ title: "Last archived URL", value: "last_url_archived_at", sortable: true },
 				{ title: 'Actions', value: "actions", align: 'center' },
 			],
 
