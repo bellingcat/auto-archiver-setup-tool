@@ -35,10 +35,11 @@
 				Quota and rules for group <code>{{ group }}</code>:
 				<ul>
 					<li>
-						Active sheets: 
-						<strong>{{ groupUsage.total_sheets || 0 }}</strong> out of 
-						<strong>{{ displayPermissionValue(groupPermissions?.max_sheets, "")}}</strong>
-						<v-chip v-if="maxedOutGroupQuota" label class="ml-2" color="red" density="comfortable" size="small">maxed out</v-chip>
+						Active sheets:
+						<strong>{{ groupUsage.total_sheets || 0 }}</strong> out of
+						<strong>{{ displayPermissionValue(groupPermissions?.max_sheets, "") }}</strong>
+						<v-chip v-if="maxedOutGroupQuota" label class="ml-2" color="red" density="comfortable"
+							size="small">maxed out</v-chip>
 					</li>
 					<li>Monthly URLs: <strong>{{ groupUsage.monthly_urls || 0 }}</strong> out of <strong>{{
 						displayPermissionValue(groupPermissions?.max_monthly_urls, " URLs") }}</strong></li>
@@ -47,7 +48,8 @@
 					<li>How long will we store these archives: <strong>{{
 						displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
 					</li>
-					<li>You <strong>{{ groupPermissions?.manually_trigger_sheet?"can":"cannot" }}</strong> manually trigger sheeets in this group. </li>
+					<li>You <strong>{{ groupPermissions?.manually_trigger_sheet ? "can" : "cannot" }}</strong> manually
+						trigger sheeets in this group. </li>
 				</ul>
 			</span>
 		</v-col>
@@ -101,7 +103,10 @@ export default {
 			return this.sheetName && this.spreadsheetId && this.availableGroups?.some(g => g.value === this.group) && this.availableFrequencies?.some(f => f === this.frequency) && !this.maxedOutGroupQuota;
 		},
 		availableGroups() {
-			return (this.$store.state.user?.groups || []).map(g => ({ title: g, value: g }));
+			const permissions = this.$store.state.user?.permissions || {};
+			return Object.keys(permissions)
+				.filter(group => group !== "all" && permissions[group].archive_sheet)
+				.map(g => ({ title: g, value: g }));
 		},
 		availableFrequencies() {
 			return this.$store.state.user?.permissions?.[this.group]?.sheet_frequency || [];
@@ -112,7 +117,8 @@ export default {
 		groupUsage() {
 			return this.$store.state.user?.usage?.["groups"]?.[this.group] || {};
 		},
-		maxedOutGroupQuota(){
+		maxedOutGroupQuota() {
+			if (this.groupPermissions?.archive_sheet === false) return true;
 			if (this.groupPermissions.max_sheets === -1) return false;
 			return this.groupUsage.total_sheets >= this.groupPermissions.max_sheets;
 		},

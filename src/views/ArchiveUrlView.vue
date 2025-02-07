@@ -92,8 +92,6 @@ export default {
   },
   data() {
     return {
-      availableGroups: [{ title: "only me", value: "" }].concat((this.$store.state.user?.groups || []).map(g => ({ title: g, value: g }))),
-
       url: "",
       public: true,
       group: "",
@@ -123,6 +121,14 @@ export default {
     },
     validUrl() {
       return this.url && this.urlValidator(this.url) === true;
+    },
+    availableGroups() {
+      const permissions = this.$store.state.user?.permissions || {};
+      return [{ title: "only me", value: "" }].concat(
+        Object.keys(permissions)
+          .filter(group => group !== "all" && permissions[group].archive_url)
+          .map(g => ({ title: g, value: g }))
+      );
     },
     globalUsage() {
       return this.$store.state.user?.usage || {};
