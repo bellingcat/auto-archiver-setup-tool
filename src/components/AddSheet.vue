@@ -45,7 +45,7 @@
 						displayPermissionValue(groupPermissions?.max_monthly_urls, " URLs") }}</strong></li>
 					<li>Monthly MBs: <strong>{{ groupUsage.monthly_mbs || 0 }}</strong> out of <strong>{{
 						displayPermissionValue(groupPermissions?.max_monthly_mbs, " MBs") }}</strong></li>
-					<li>How long will we store these archives: <strong>{{
+					<li>We will store archives for: <strong>{{
 						displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
 					</li>
 					<li>You <strong>{{ groupPermissions?.manually_trigger_sheet ? "can" : "cannot" }}</strong> manually

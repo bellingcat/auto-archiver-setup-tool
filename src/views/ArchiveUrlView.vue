@@ -17,12 +17,11 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="4">
-            <v-select v-show="!public" v-model="group" label="Group" :items="availableGroups"
-              density="compact"></v-select>
+            <v-select v-model="group" label="Group" :items="availableGroups" density="compact"></v-select>
           </v-col>
           <v-col cols="12" md="4" class="text-right">
             <v-btn @click="archiveUrl" color="teal"
-              :disabled="!validUrl || loadingArchive || (!public && group == -1) || maxedOutMBs || maxedOutURLs">
+              :disabled="!validUrl || loadingArchive || (group == 'please select') || maxedOutMBs || maxedOutURLs">
               Archive
             </v-btn>
           </v-col>
@@ -48,7 +47,7 @@
               this URL.
             </p>
           </v-col>
-          <v-col cols="12" sm="12" class="pt-0">
+          <v-col cols="12" sm="12" class="pt-0" v-if="group != 'please select'">
             <span>
               Quota and rules<span v-if="group != ''"> for group <code>{{ group }}</code></span>:
               <ul>
@@ -67,7 +66,7 @@
                   <v-chip v-if="maxedOutMBs" label class="ml-2" color="red" density="comfortable" size="small">maxed
                     out</v-chip>
                 </li>
-                <li>How long will we store these archives: <strong>{{
+                <li>We will store archives for: <strong>{{
                   displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
                 </li>
               </ul>
@@ -93,8 +92,8 @@ export default {
   data() {
     return {
       url: "",
-      public: true,
-      group: "",
+      public: false,
+      group: "please select",
       loadingArchive: false,
 
       taskId: null,
@@ -124,11 +123,9 @@ export default {
     },
     availableGroups() {
       const permissions = this.$store.state.user?.permissions || {};
-      return [{ title: "only me", value: "" }].concat(
-        Object.keys(permissions)
-          .filter(group => group !== "all" && permissions[group].archive_url)
-          .map(g => ({ title: g, value: g }))
-      );
+      return Object.keys(permissions)
+        .filter(group => group !== "all" && permissions[group].archive_url)
+        .map(g => ({ title: g, value: g }));
     },
     globalUsage() {
       return this.$store.state.user?.usage || {};
@@ -181,7 +178,7 @@ export default {
         },
         body: JSON.stringify({
           url: this.url,
-          group: this.public ? "" : this.group,
+          group_id: this.group,
           public: this.public,
           tags: [],
         })
