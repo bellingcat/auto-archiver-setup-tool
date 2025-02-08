@@ -22,7 +22,6 @@ const PRIVATE_KEY = defineSecret('GOOGLE_API_PRIVATE_KEY');
 const { google } = require('googleapis');
 
 initializeApp();
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 String.prototype.hashCode = function () {
@@ -40,6 +39,7 @@ String.prototype.hashCode = function () {
   return hash;
 }
 
+//TODO: disable the scheduler
 exports.processSheetScheduler = onSchedule(
   { secrets: [API_TOKEN, CLIENT_EMAIL, PRIVATE_KEY], schedule: "* * * * *" },
   async (event) => {
@@ -87,7 +87,6 @@ exports.processSheetScheduler = onSchedule(
       };
 
       const response = await fetch(url, options);
-      console.log(response);
 
       await doc.ref.update({ lastArchived: Date.now() });
 
