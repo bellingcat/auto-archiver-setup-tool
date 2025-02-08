@@ -343,6 +343,7 @@ export default createStore({
           );
 
           // add permissions
+          // TODO: make sure this emailAdress is used according to the group
           await gapi.client.drive.permissions.create({
             fileId: spreadsheetId,
             resource: {

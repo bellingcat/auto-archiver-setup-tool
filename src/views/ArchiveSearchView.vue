@@ -52,7 +52,15 @@
                     <a :href="item.url" target="_blank" rel="noopener noreferrer">{{ item.url }}</a>
                   </template>
                   <template v-slot:item.created_at="{ item }">
-                    <time :datetime="item?.created_at">{{ item?.created_at }}</time>
+                    <time :datetime="item?.created_at"
+                      :title="$moment(item?.created_at).format(`MMMM Do YYYY, k:mm:ss`)">{{
+                        $moment(item?.created_at).fromNow() }}</time>
+                  </template>
+                  <template v-slot:item.store_until="{ item }">
+                    <time :datetime="item?.store_until"
+                      :title="`this archive will be deleted on: ${$moment(item?.store_until).format(`MMMM Do YYYY, k:mm:ss`)}`"
+                      :style="{ color: $moment().diff(item?.store_until, 'days') > -31 ? 'red' : 'inherit' }">{{
+                      item?.store_until ? $moment(item?.store_until).fromNow() : "never" }}</time>
                   </template>
                   <template v-slot:item.size="{ item }">
                     {{ ((item?.result?.metadata?.total_bytes || 0) / (1024 * 1024)).toFixed(2) }}
@@ -123,7 +131,8 @@ export default {
       headers: [
         { title: "URL", value: "url" },
         { title: "Result", value: "result" },
-        { title: "Archived At", value: "created_at" },
+        { title: "Archived", value: "created_at" },
+        { title: "Deleted", value: "store_until", width: "150px" },
         { title: "Size (MB)", value: "size" },
         { title: "Files", value: "files" },
         { title: '', key: 'data-table-expand' },

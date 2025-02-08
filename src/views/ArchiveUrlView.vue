@@ -1,7 +1,7 @@
 <template>
   <PermissionNeeded v-if="user && !featureEnabled" feature="Archive URL" />
   <v-container class="pane" v-if="user?.active && featureEnabled">
-    <v-card :loading="loadingArchive">
+    <v-card>
       <v-card-title class="text-center">
         Archive a single URL
       </v-card-title>
@@ -30,11 +30,12 @@
           <v-col cols="12">
             <p v-if="loadingArchive">
               <v-progress-circular color="teal" indeterminate></v-progress-circular>
-              Archive in progress task id = <code>{{ taskId }}</code>
+              Archive in progress <span v-if="taskId">task id = <code>{{ taskId }}</code></span>
             </p>
             <v-alert color="success" icon="mdi-information" v-if="archiveResult">
-              Archived successfully with id {{ taskId }} available <a :href="getUrlFromResult(archiveResult)"
-                target="_blank">here</a>.
+              Archived successfully with id {{ archiveResult.id }}
+              <span v-if="urlFromResult"> available <a :href="urlFromResult" target="_blank">here</a>.</span>
+              <span v-if="!urlFromResult">no archived content to show.</span>
             </v-alert>
             <v-alert color="warning" icon="mdi-alert" v-if="archiveFailure">
               Failure: {{ archiveFailure }}
@@ -115,8 +116,9 @@ export default {
     urlValidator() {
       return urlValidator;
     },
-    getUrlFromResult() {
-      return getUrlFromResult;
+    urlFromResult() {
+      if (!this.archiveResult) return null;
+      return getUrlFromResult(this.archiveResult);
     },
     validUrl() {
       return this.url && this.urlValidator(this.url) === true;
@@ -156,6 +158,10 @@ export default {
       this.archiveResult = null;
       this.archiveFailure = null;
       this.taskId = null;
+      if (this.loadingArchive) {
+        this.loadingArchive = false;
+        this.showSnackbar("Your previous archive will run in the background.", "yellow");
+      }
     },
   },
   methods: {
@@ -197,13 +203,15 @@ export default {
         .catch(error => {
           console.error("/archive ", error);
           this.showSnackbar(`Unable to archive URL: ${error.message}`);
-        }).finally(() => {
           this.loadingArchive = false;
         });
     },
     pollForArchiveResults() {
       this.loadingArchive = true;
       const poll = () => {
+        if (!this.loadingArchive) {
+          return;
+        }
         fetch(`${this.$store.state.API_ENDPOINT}/task/${this.taskId}`, {
           method: "GET",
           headers: {
@@ -216,8 +224,8 @@ export default {
             if (task.status === "SUCCESS") {
               this.showSnackbar(`URL archived successfully with id ${task.result.id}!`, "green");
               this.loadingArchive = false;
-              this.taskId = null;
               this.archiveResult = task;
+              this.taskId = task.id;
             } else if (task.status === "FAILURE") {
               this.showSnackbar(`Failed to archive URL: ${task.result.error}`);
               this.loadingArchive = false;
