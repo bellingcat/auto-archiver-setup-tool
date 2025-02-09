@@ -51,7 +51,10 @@
           </v-col>
           <v-col cols="12" sm="12" class="pt-0" v-if="group != 'please select'">
             <span>
-              Quota and rules<span v-if="group != ''"> for group <code>{{ group }}</code></span>:
+              <code>{{ group }}</code><br />
+              <span class="text-medium-emphasis mb-1">
+                {{ groupPermissions.description }}
+              </span>
               <ul>
                 <li>
                   Monthly URLs: <strong>{{ groupUsage.monthly_urls || 0 }}</strong>

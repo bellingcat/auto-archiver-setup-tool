@@ -32,7 +32,10 @@
 		</v-col>
 		<v-col cols="12" sm="12" class="pt-0" v-if="group != 'please select'">
 			<span>
-				Quota and rules for group <code>{{ group }}</code>:
+				<code>{{ group }}</code><br/>
+				<span class="text-medium-emphasis mb-1">
+					{{ groupPermissions.description }}
+				</span>
 				<ul>
 					<li>
 						Active sheets:
@@ -87,7 +90,7 @@ export default {
 
 			group: "please select",
 
-			frequency: "please select group",
+			frequency: "please select",
 
 			newSheetId: "",
 		};
