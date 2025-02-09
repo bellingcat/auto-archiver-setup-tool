@@ -32,6 +32,10 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "tos" */ '../views/TOSView.vue'),
   },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
+  }
 ];
 
 const router = createRouter({

@@ -1,5 +1,6 @@
 <template>
   <PermissionNeeded v-if="user && !featureEnabled" feature="Archive URL" />
+  <WelcomeCard />
   <v-container class="pane" v-if="user?.active && featureEnabled">
     <v-card>
       <v-card-title class="text-center">
@@ -84,11 +85,12 @@
 import { urlValidator, getUrlFromResult } from "@/utils/misc";
 import SnackBar from "@/components/SnackBar.vue";
 import PermissionNeeded from "@/components/PermissionNeeded.vue";
+import WelcomeCard from "@/components/WelcomeCard.vue";
 
 export default {
   name: "ArchiveUrlView",
   components: {
-    SnackBar, PermissionNeeded
+    SnackBar, PermissionNeeded, WelcomeCard
   },
   data() {
     return {

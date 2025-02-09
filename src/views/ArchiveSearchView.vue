@@ -1,5 +1,6 @@
 <template>
   <PermissionNeeded v-if="user && !featureEnabled" feature="Search Archives" />
+  <WelcomeCard/>
   <v-container class="pane-l" v-if="user?.active && featureEnabled">
     <v-row>
       <v-col>
@@ -60,7 +61,7 @@
                     <time :datetime="item?.store_until"
                       :title="`this archive will be deleted on: ${$moment(item?.store_until).format(`MMMM Do YYYY, k:mm:ss`)}`"
                       :style="{ color: $moment().diff(item?.store_until, 'days') > -31 ? 'red' : 'inherit' }">{{
-                      item?.store_until ? $moment(item?.store_until).fromNow() : "never" }}</time>
+                        item?.store_until ? $moment(item?.store_until).fromNow() : "never" }}</time>
                   </template>
                   <template v-slot:item.size="{ item }">
                     {{ ((item?.result?.metadata?.total_bytes || 0) / (1024 * 1024)).toFixed(2) }}
@@ -111,11 +112,12 @@
 <script>
 import PermissionNeeded from "@/components/PermissionNeeded.vue";
 import { urlValidator, getUrlFromResult } from "@/utils/misc.js";
+import WelcomeCard from "@/components/WelcomeCard.vue";
 
 export default {
   name: "ArchiveSearchView",
   components: {
-    PermissionNeeded
+    PermissionNeeded, WelcomeCard
   },
   data() {
     return {

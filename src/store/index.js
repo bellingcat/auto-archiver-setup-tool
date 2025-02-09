@@ -56,11 +56,13 @@ export default createStore({
     },
     setUserActiveState(state, active) {
       state.user.active = active;
-      state.loadingUserState = false;
+      saveToLocalStorage(state);
     },
     setUserPermissions(state, permissions) {
       state.user.permissions = permissions;
       state.user.groups = Object.keys(permissions).filter(key => key !== "all");
+      state.loadingUserState = false;
+      saveToLocalStorage(state);
     },
     setUserUsage(state, usage) {
       state.user.usage = usage;
@@ -70,6 +72,7 @@ export default createStore({
     },
     setLoadingUserState(state, loadingUserState) {
       state.loadingUserState = loadingUserState;
+      saveToLocalStorage(state);
     },
     setAccessToken(state, access_token) {
       state.access_token = access_token;
@@ -81,6 +84,7 @@ export default createStore({
   },
   actions: {
     async signin({ commit, dispatch }) {
+      commit("setLoadingUserState", true);
       async function callback(tokenResponse) {
         let access_token = tokenResponse.access_token;
         commit("setAccessToken", access_token);
@@ -88,7 +92,6 @@ export default createStore({
 
         const response = await signInWithCredential(firebaseAuth, credential);
 
-        commit("setLoadingUserState", true);
         commit("setUser", response.user);
         dispatch("checkActiveUser");
         dispatch("checkUserPermissions");
@@ -127,6 +130,8 @@ export default createStore({
         clearLocalStorage();
       } catch (error) {
         console.error("signOutUser (firebase/auth.js): ", error);
+      } finally {
+        commit("setLoadingUserState", false);
       }
     },
 
@@ -390,6 +395,7 @@ export default createStore({
 
       const { user, access_token } = loadFromLocalStorage();
       if (user && access_token) {
+        store.commit("setLoadingUserState", true);
         store.commit("setUser", user);
         store.commit("setAccessToken", access_token);
         store.getters.isTokenExpired.then((expired) => {
