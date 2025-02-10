@@ -227,15 +227,15 @@ export default {
           .then(response => response.json())
           .then(task => {
             if (task.status === "SUCCESS") {
-              this.showSnackbar(`URL archived successfully with id ${task.result.id}!`, "green");
+              this.showSnackbar(`URL archived successfully with id ${task.id}!`, "green");
               this.loadingArchive = false;
               this.archiveResult = task;
               this.taskId = task.id;
             } else if (task.status === "FAILURE") {
-              this.showSnackbar(`Failed to archive URL: ${task.result.error}`);
+              this.showSnackbar(`Failed to archive URL: ${task.error}`);
               this.loadingArchive = false;
               this.taskId = null;
-              this.archiveFailure = task.result.error;
+              this.archiveFailure = task.error;
             } else {
               setTimeout(poll, 5000); // Poll every 5 seconds
             }
