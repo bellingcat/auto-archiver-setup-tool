@@ -32,9 +32,8 @@
 		</v-col>
 		<v-col cols="12" sm="12" class="pt-0" v-if="group != 'please select'">
 			<span>
-				<code>{{ group }}</code><br/>
 				<span class="text-medium-emphasis mb-1">
-					{{ groupPermissions.description }}
+					<strong>{{ group }}</strong>: {{ groupPermissions.description }}
 				</span>
 				<ul>
 					<li>
@@ -52,8 +51,12 @@
 						displayPermissionValue(groupPermissions?.max_archive_lifespan_months, " months") }}</strong>
 					</li>
 					<li>You <strong>{{ groupPermissions?.manually_trigger_sheet ? "can" : "cannot" }}</strong> manually
-						trigger sheeets in this group. </li>
+						trigger sheets in this group. </li>
 				</ul>
+				<p v-if="!actionIsCreate" class="text-medium-emphasis mt-2">
+					<strong>NOTE:</strong> invite <a :href="`mailto:${groupPermissions?.service_account_email}`">{{
+						groupPermissions?.service_account_email }}</a> to the sheet, see further instructions below.
+				</p>
 			</span>
 		</v-col>
 
@@ -149,7 +152,7 @@ export default {
 
 			this.loading = true;
 			this.newSheetId = "";
-			this.$store.dispatch("createSheet", this.sheetName).then((res) => {
+			this.$store.dispatch("createSheet", { name: this.sheetName, service_account_email: this.groupPermissions.service_account_email }).then((res) => {
 				this.$store.dispatch("checkUserUsage");
 				if (!res.success) throw new Error(res.result);
 				this.newSheetId = res.result;

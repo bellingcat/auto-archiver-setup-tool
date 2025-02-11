@@ -225,7 +225,7 @@ export default createStore({
       }
 
     },
-    async createSheet({ state, dispatch, commit }, name) {
+    async createSheet({ state, dispatch, commit }, {name, service_account_email}) {
       return new Promise(async (resolve, reject) => {
         try {
           // create new sheet
@@ -355,7 +355,7 @@ export default createStore({
               role: "writer",
               type: "user",
               emailAddress:
-                "bellingcat-auto-archiver-api@bellingcat-auto-archiver-b85db.iam.gserviceaccount.com",
+              service_account_email,
             },
           });
 

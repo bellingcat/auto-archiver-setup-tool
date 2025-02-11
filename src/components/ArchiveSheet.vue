@@ -15,11 +15,11 @@
                 <v-expansion-panel-title>Instructions</v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <ol>
-                    <li>Choose a sheet name;</li>
-                    <li>Choose a group: this will impact where/how to archive;</li>
-                    <li>Choose a frequency: how often to archive;</li>
-                    <li>Press "create" and wait;</li>
-                    <li>Sheet will appear in "Your Sheets" below.</li>
+                    <li>Choose a sheet name</li>
+                    <li>Choose a group: this will impact where/how to archive</li>
+                    <li>Choose a frequency: how often to archive</li>
+                    <li>Press "create" and wait</li>
+                    <li>Sheet will appear in "Your Sheets" below</li>
                   </ol>
                   <small>
                     <b>NB:</b> This new sheet will be shared with the
@@ -39,15 +39,12 @@
                 <v-expansion-panel-title>Instructions</v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <ol style="margin-bottom: 1em">
-                    <li>
-                      Invite
-                      <code>bellingcat-auto-archiver-api@bellingcat-auto-archiver-b85db.iam.gserviceaccount.com</code>
-                      into your spreadsheet
-                    </li>
+                    <li>Choose a group to associate with this Google Sheet</li>
+                    <li>Invite the provided email as Editor to your Google Sheet</li>
                     <li>
                       Make sure you have the following <b>mandatory</b> column names:
                       <ul>
-                        <li><code>Link</code> where you will put the URLs.</li>
+                        <li><code>Link</code> where you will put the URLs</li>
                         <li>
                           <code>Archive Status</code> to monitor progress and success
                           of archiver
