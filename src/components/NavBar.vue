@@ -6,38 +6,75 @@
       </router-link>
     </v-toolbar-title>
 
-
-    <v-chip v-if="$store.state.errorMessage" :title="$store.state.errorMessage" color="red" variant="tonal" closable
-      class="mx-4">
+    <v-chip
+      v-if="$store.state.errorMessage"
+      :title="$store.state.errorMessage"
+      color="red"
+      variant="tonal"
+      closable
+      class="mx-4"
+    >
       ERROR: {{ $store.state.errorMessage }}
     </v-chip>
 
     <v-spacer v-if="!smAndDown"></v-spacer>
     <div v-if="user?.active && !smAndDown">
       <template v-for="btn in btns">
-        <v-btn :to="btn.to" :prepend-icon="btn.icon" variant="text" class="nodecoration ml-2" size="large" active-color="teal">
+        <v-btn
+          :to="btn.to"
+          :prepend-icon="btn.icon"
+          variant="text"
+          class="nodecoration ml-2"
+          size="large"
+          active-color="teal"
+        >
           {{ btn.text }}
-          <v-tooltip activator="parent" location="bottom">{{ btn.tooltip }}</v-tooltip>
+          <v-tooltip activator="parent" location="bottom">{{
+            btn.tooltip
+          }}</v-tooltip>
         </v-btn>
       </template>
     </div>
 
     <v-spacer v-if="!smAndDown"></v-spacer>
-    <span class="user mx-2 pa-2 bg-blue-grey-lighten-5 rounded elevation-2" v-if="user">
+    <span
+      class="user mx-2 pa-2 bg-blue-grey-lighten-5 rounded elevation-2"
+      v-if="user"
+    >
       <span v-if="!loadingUserState">
-        <v-chip v-if="user.active" color="green" class="bg-white" prepend-icon="mdi-checkbox-marked-circle"
-          variant="outlined">
+        <v-chip
+          v-if="user.active"
+          color="green"
+          class="bg-white"
+          prepend-icon="mdi-checkbox-marked-circle"
+          variant="outlined"
+        >
           active
         </v-chip>
-        <v-chip v-if="!user.active" color="red" class="bg-white" prepend-icon="mdi-account-cancel" variant="outlined">
+        <v-chip
+          v-if="!user.active"
+          color="red"
+          class="bg-white"
+          prepend-icon="mdi-account-cancel"
+          variant="outlined"
+        >
           inactive
         </v-chip>
 
-        <v-tooltip activator="parent" location="bottom">{{ activeUserMessage }}</v-tooltip>
+        <v-tooltip activator="parent" location="bottom">{{
+          activeUserMessage
+        }}</v-tooltip>
       </span>
       <span class="ms-2">{{ user.email }}</span>
-      <v-btn v-if="!smAndDown" prepend-icon="mdi-logout" variant="text" class="mx-2 elevation-2 bg-white" size="small"
-        @click="$store.dispatch('signout')">Sign Out</v-btn>
+      <v-btn
+        v-if="!smAndDown"
+        prepend-icon="mdi-logout"
+        variant="text"
+        class="mx-2 elevation-2 bg-white"
+        size="small"
+        @click="$store.dispatch('signout')"
+        >Sign Out</v-btn
+      >
     </span>
 
     <v-btn v-if="!user" @click="$store.dispatch('signin')">Sign In</v-btn>
@@ -48,21 +85,33 @@
       </template>
       <v-list>
         <v-list-item v-for="btn in btns" :key="btn.to" :to="btn.to">
-          <v-btn :prepend-icon="btn.icon" variant="plain" class="nodecoration" size="large">
+          <v-btn
+            :prepend-icon="btn.icon"
+            variant="plain"
+            class="nodecoration"
+            size="large"
+          >
             {{ btn.text }}
           </v-btn>
-          <v-tooltip activator="parent" location="left">{{ btn.tooltip }}</v-tooltip>
+          <v-tooltip activator="parent" location="left">{{
+            btn.tooltip
+          }}</v-tooltip>
         </v-list-item>
         <v-list-item @click="$store.dispatch('signout')">
-          <v-btn prepend-icon="mdi-logout" variant="plain" class="nodecoration" size="large">Sign Out</v-btn>
+          <v-btn
+            prepend-icon="mdi-logout"
+            variant="plain"
+            class="nodecoration"
+            size="large"
+            >Sign Out</v-btn
+          >
         </v-list-item>
       </v-list>
     </v-menu>
   </v-app-bar>
-
 </template>
 <script setup>
-import { useDisplay } from 'vuetify'
+import { useDisplay } from "vuetify";
 const { smAndDown } = useDisplay();
 </script>
 
@@ -73,10 +122,25 @@ export default {
     return {
       drawer: false,
       btns: [
-        { to: "/", icon: "mdi-table-large", text: "Sheets", tooltip: "Create, manage, and archive Google Sheets." },
-        { to: "/url", icon: "mdi-cloud-download-outline", text: "URL", tooltip: "Archive a single URL." },
-        { to: "/archives", icon: "mdi-magnify", text: "Archives", tooltip: "Search for archived URLs." },
-      ]
+        {
+          to: "/",
+          icon: "mdi-table-large",
+          text: "Sheets",
+          tooltip: "Create, manage, and archive Google Sheets.",
+        },
+        {
+          to: "/url",
+          icon: "mdi-cloud-download-outline",
+          text: "URL",
+          tooltip: "Archive a single URL.",
+        },
+        {
+          to: "/archives",
+          icon: "mdi-magnify",
+          text: "Archives",
+          tooltip: "Search for archived URLs.",
+        },
+      ],
     };
   },
   computed: {
@@ -89,9 +153,9 @@ export default {
       }
       return "This account is inactive, please reach out to the Bellingcat team for access.";
     },
-		loadingUserState() {
-			return this.$store.state?.loadingUserState;
-		}
+    loadingUserState() {
+      return this.$store.state?.loadingUserState;
+    },
   },
 };
 </script>

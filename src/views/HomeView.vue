@@ -1,6 +1,9 @@
 <template>
-  <PermissionNeeded v-if="user && !featureEnabled" feature="Archive Spreadsheets" />
-  <WelcomeCard/>
+  <PermissionNeeded
+    v-if="user && !featureEnabled"
+    feature="Archive Spreadsheets"
+  />
+  <WelcomeCard />
   <ArchiveSheet v-if="user?.active && featureEnabled" />
   <ManageSheets v-if="user?.active && featureEnabled" />
 </template>
@@ -14,7 +17,10 @@ import WelcomeCard from "@/components/WelcomeCard.vue";
 export default {
   name: "HomeView",
   components: {
-    ArchiveSheet, ManageSheets, PermissionNeeded, WelcomeCard
+    ArchiveSheet,
+    ManageSheets,
+    PermissionNeeded,
+    WelcomeCard,
   },
   computed: {
     user() {
@@ -22,7 +28,7 @@ export default {
     },
     featureEnabled() {
       return this.user?.permissions?.["all"]?.archive_sheet;
-    }
-  }
+    },
+  },
 };
 </script>

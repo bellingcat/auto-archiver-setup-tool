@@ -13,17 +13,25 @@
           </div>
         </v-col>
         <v-col cols="12">
-          You can deploy your own version of this tool by hosting the <a href="https://github.com/bellingcat/auto-archiver-api">API</a> and the <a href="https://github.com/bellingcat/auto-archiver-api">UI</a>.
-          <br/>
-          This tool uses <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a> under the hood to archive online content.
-          <br/>
-          For more information about it see <a
-            href="https://www.bellingcat.com/resources/2022/09/22/preserve-vital-online-content-with-bellingcats-auto-archiver-tool/">associated
-            article</a>.
-          
+          You can deploy your own version of this tool by hosting the
+          <a href="https://github.com/bellingcat/auto-archiver-api">API</a> and
+          the
+          <a href="https://github.com/bellingcat/auto-archiver-setup-tool">UI</a
+          >.
+          <br />
+          This tool uses
+          <a href="https://github.com/bellingcat/auto-archiver"
+            >Bellingcat's Auto Archiver</a
+          >
+          under the hood to archive online content.
+          <br />
+          For more information about it see
+          <a
+            href="https://www.bellingcat.com/resources/2022/09/22/preserve-vital-online-content-with-bellingcats-auto-archiver-tool/"
+            >associated article</a
+          >.
         </v-col>
       </v-row>
-
     </v-footer>
   </v-app>
 </template>
@@ -96,14 +104,14 @@ p {
 }
 
 code {
-  background-color: rgba(0, 0, 0, .1);
-  padding: .2em .4em;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
 }
 
 .v-card .v-card-text {
   font-size: 1.1rem;
   font-weight: 400;
   line-height: 1.7rem;
-  letter-spacing: .0092em;
+  letter-spacing: 0.0092em;
 }
 </style>

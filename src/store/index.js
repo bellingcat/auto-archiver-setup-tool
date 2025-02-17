@@ -1,12 +1,13 @@
 import { createStore } from "vuex";
-import { gapi, client } from "@/gapi";
+import { gapi } from "@/gapi";
 import {
   signOut,
   GoogleAuthProvider,
   signInWithCredential,
+  browserLocalPersistence,
+  setPersistence,
 } from "firebase/auth";
-import { collection, } from "firebase/firestore";
-import { firebaseAuth, firebaseFirestore } from "@/firebase.js";
+import { firebaseAuth } from "@/firebase.js";
 
 function saveToLocalStorage(state) {
   localStorage.setItem("user", JSON.stringify(state.user));
@@ -25,7 +26,7 @@ function clearLocalStorage() {
 }
 
 async function waitForGapiAuth2() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const checkGapiAuth2 = () => {
       if (gapi.auth2 && gapi.auth2.getAuthInstance()) {
         resolve(gapi.auth2.getAuthInstance());
@@ -45,9 +46,8 @@ export default createStore({
     sheets: [],
     loadingUserState: false,
     errorMessage: "",
-    // # TODO: reenable production API endpoint
     // API_ENDPOINT: "https://auto-archiver-api.bellingcat.com"
-    API_ENDPOINT: "http://localhost:8004"
+    API_ENDPOINT: process.env.VUE_APP_API_ENDPOINT || "http://localhost:8004",
   },
   mutations: {
     setUser(state, user) {
@@ -60,7 +60,9 @@ export default createStore({
     },
     setUserPermissions(state, permissions) {
       state.user.permissions = permissions;
-      state.user.groups = Object.keys(permissions).filter(key => key !== "all");
+      state.user.groups = Object.keys(permissions).filter(
+        (key) => key !== "all"
+      );
       state.loadingUserState = false;
       saveToLocalStorage(state);
     },
@@ -90,6 +92,10 @@ export default createStore({
         commit("setAccessToken", access_token);
         const credential = GoogleAuthProvider.credential(null, access_token);
 
+        // Set persistence before signing in
+        await setPersistence(firebaseAuth, browserLocalPersistence);
+
+        // Sign in with the provided credential
         const response = await signInWithCredential(firebaseAuth, credential);
 
         commit("setUser", response.user);
@@ -108,7 +114,7 @@ export default createStore({
         callback,
       });
 
-      client.requestAccessToken();
+      await client.requestAccessToken();
     },
 
     async signout({ commit }) {
@@ -138,16 +144,14 @@ export default createStore({
     async checkActiveUser({ state, dispatch, commit }) {
       try {
         commit("setErrorMessage", "");
-        const r = await fetch(
-          `${state.API_ENDPOINT}/user/active`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${state.access_token}`,
-            },
-          }
-        )
+        console.log(`${state.API_ENDPOINT}/user/active`);
+        const r = await fetch(`${state.API_ENDPOINT}/user/active`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${state.access_token}`,
+          },
+        });
         const response = await r.json();
         commit("setUserActiveState", response.active);
         if (response.active === true) {
@@ -155,48 +159,51 @@ export default createStore({
         }
       } catch (error) {
         console.error("checkActiveUser (firebase.js): ", error);
-        commit("setErrorMessage", "Unable to check user status against the API");
+        commit(
+          "setErrorMessage",
+          "Unable to check user status against the API"
+        );
       }
     },
 
     async checkUserPermissions({ state, commit }) {
       try {
         commit("setErrorMessage", "");
-        const r = await fetch(
-          `${state.API_ENDPOINT}/user/permissions`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${state.access_token}`,
-            },
-          }
-        );
+        const r = await fetch(`${state.API_ENDPOINT}/user/permissions`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${state.access_token}`,
+          },
+        });
         const response = await r.json();
         commit("setUserPermissions", response);
       } catch (error) {
         console.error("checkUserPermissions (firebase.js): ", error);
-        commit("setErrorMessage", "Unable to fetch user permissions from the API");
+        commit(
+          "setErrorMessage",
+          "Unable to fetch user permissions from the API"
+        );
       }
     },
     async checkUserUsage({ state, commit }) {
       try {
         commit("setErrorMessage", "");
-        const r = await fetch(
-          `${state.API_ENDPOINT}/user/usage`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${state.access_token}`,
-            },
-          }
-        );
+        const r = await fetch(`${state.API_ENDPOINT}/user/usage`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${state.access_token}`,
+          },
+        });
         const response = await r.json();
         commit("setUserUsage", response);
       } catch (error) {
         console.error("checkUserUsage (firebase.js): ", error);
-        commit("setErrorMessage", "Unable to fetch user usage quota from the API");
+        commit(
+          "setErrorMessage",
+          "Unable to fetch user usage quota from the API"
+        );
       }
     },
 
@@ -210,8 +217,8 @@ export default createStore({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${state.access_token}`,
-          }
-        }).then(async response => {
+          },
+        }).then(async (response) => {
           const res = await response.json();
           if (response.status === 200) {
             commit("setSheets", res);
@@ -219,13 +226,14 @@ export default createStore({
             throw new Error(JSON.stringify(res));
           }
         });
-
       } catch (error) {
         console.error("getSheets (firebase.js): ", error);
       }
-
     },
-    async createSheet({ state, dispatch, commit }, {name, service_account_email}) {
+    async createSheet(
+      { _state, dispatch, _commit },
+      { name, service_account_email }
+    ) {
       return new Promise(async (resolve, reject) => {
         try {
           // create new sheet
@@ -354,8 +362,7 @@ export default createStore({
             resource: {
               role: "writer",
               type: "user",
-              emailAddress:
-              service_account_email,
+              emailAddress: service_account_email,
             },
           });
 
@@ -374,7 +381,9 @@ export default createStore({
     isTokenExpired: async (state) => {
       if (!state.access_token) return true;
       try {
-        const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${state.access_token}`);
+        const response = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?access_token=${state.access_token}`
+        );
         if (response.status !== 200) return true;
         const data = await response.json();
         if (data.expires_in > 0) return false;
@@ -398,18 +407,20 @@ export default createStore({
         store.commit("setLoadingUserState", true);
         store.commit("setUser", user);
         store.commit("setAccessToken", access_token);
-        store.getters.isTokenExpired.then((expired) => {
-          if (expired) {
+        store.getters.isTokenExpired
+          .then((expired) => {
+            if (expired) {
+              store.dispatch("signout");
+            } else {
+              store.dispatch("checkActiveUser");
+              store.dispatch("checkUserPermissions");
+              store.dispatch("checkUserUsage");
+            }
+          })
+          .catch((error) => {
+            console.error("Error checking token expiration:", error);
             store.dispatch("signout");
-          } else {
-            store.dispatch("checkActiveUser");
-            store.dispatch("checkUserPermissions");
-            store.dispatch("checkUserUsage");
-          }
-        }).catch((error) => {
-          console.error("Error checking token expiration:", error);
-          store.dispatch("signout");
-        });
+          });
       }
     },
   ],
