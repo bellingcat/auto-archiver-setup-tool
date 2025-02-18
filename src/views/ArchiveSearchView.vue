@@ -224,7 +224,7 @@ export default {
       today: new Date().toISOString().substring(0, 10),
       queryAfter: null,
       queryBefore: null,
-      queryUrl: this.$route.query.url || "https://",
+      queryUrl: this.$route.query.url || "",
       tableSearch: "", // used to retrigger the search
       loading: false,
       itemsPerPage: 5,
