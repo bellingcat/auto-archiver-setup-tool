@@ -103,8 +103,8 @@ export default {
       loading: false,
 
       headers: [
-        { title: "Name", value: "name", sortable: true },
-        { title: "Group", value: "group_id", sortable: true },
+        { title: "Name", value: "name", sortable: true, width: '30%' },
+        { title: "Group", value: "group_id", sortable: true, width: '100px' },
         { title: "Archived", value: "frequency", sortable: true },
         { title: "Created", value: "created_at", sortable: true },
         {
@@ -112,7 +112,7 @@ export default {
           value: "last_url_archived_at",
           sortable: true,
         },
-        { title: "Actions", value: "actions", align: "center" },
+        { title: "Actions", value: "actions", align: "center", width: '200px' },
       ],
     };
   },
