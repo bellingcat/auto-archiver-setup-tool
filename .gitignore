@@ -22,3 +22,4 @@ pnpm-debug.log*
 *.sln
 *.sw?
 firebase-debug.log
+ui.debug.log

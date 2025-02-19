@@ -1,18 +1,26 @@
-import Vue from "vue";
-import Vuetify from "vuetify";
+import { createApp } from "vue";
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+import { VDateInput } from "vuetify/labs/VDateInput";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import "vuetify/dist/vuetify.min.css";
+import moment from "moment";
+import "vuetify/styles";
 import "@mdi/font/css/materialdesignicons.css";
+import "./styles/global.css";
 
-Vue.use(Vuetify);
+const vuetify = createVuetify({
+  components: { ...components, VDateInput },
+  directives,
+});
 
-Vue.config.productionTip = false;
+const app = createApp(App);
 
-new Vue({
-  router,
-  store,
-  vuetify: new Vuetify(),
-  render: (h) => h(App),
-}).$mount("#app");
+app.use(router);
+app.use(store);
+app.use(vuetify);
+app.config.globalProperties.$moment = moment;
+
+app.mount("#app");

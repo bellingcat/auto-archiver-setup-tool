@@ -1,14 +1,24 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import ArchiveSearchView from "../views/ArchiveSearchView.vue";
 
-Vue.use(VueRouter);
+import ArchiveUrlView from "../views/ArchiveUrlView.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/url",
+    name: "URL Archiving",
+    component: ArchiveUrlView,
+  },
+  {
+    path: "/archives",
+    name: "Archives search",
+    component: ArchiveSearchView,
   },
   {
     path: "/privacy",
@@ -22,11 +32,14 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "tos" */ "../views/TOSView.vue"),
   },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/",
+  },
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
