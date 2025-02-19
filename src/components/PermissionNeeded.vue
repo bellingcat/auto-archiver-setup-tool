@@ -13,8 +13,7 @@
     <a href="https://forms.gle/crqBXUtyZcbLhiRQ9" target="_blank">this form</a>.
     <br />
     <small>
-      <strong>NB: </strong>We do not allow law enforcement, military or
-      intelligence agencies to use this tool.
+      <strong>NB: </strong>We do not allow military, intelligence, police or security forces to use this tool.
     </small>
   </v-alert>
 </template>
