@@ -5,84 +5,51 @@
         Your <u v-if="items">{{ items.length }}</u> active archiver sheets
       </v-card-title>
 
-      <v-data-table
-        :headers="headers"
-        item-key="name"
-        no-data-text="No Active Sheets available"
-        :items="items"
-        :loading="loading"
-        items-per-page="25"
-        hover
-      >
+      <v-data-table :headers="headers" item-key="name" no-data-text="No Active Sheets available" :items="items"
+        :loading="loading" items-per-page="25" hover>
         <template v-slot:item.actions="{ item: data }">
-          <v-btn
-            :disabled="!canArchiveNow(data.group_id) || loading"
-            color="teal-lighten-1"
-            size="small"
-            icon
-            class="mx-2"
-            rounded
-            @click="archiveSheetNow(data.id)"
-            ><v-icon>mdi-archive-outline</v-icon>
+          <v-btn :disabled="!canArchiveNow(data.group_id) || loading" color="teal-lighten-1" size="small" icon
+            class="mx-2" rounded @click="archiveSheetNow(data.id)"><v-icon>mdi-archive-outline</v-icon>
 
-            <v-tooltip activator="parent" location="left"
-              >Archive Now!</v-tooltip
-            >
+            <v-tooltip activator="parent" location="left">Archive Now!</v-tooltip>
           </v-btn>
-          <v-btn
-            color="green-lighten-1"
-            size="small"
-            icon
-            class="mx-2"
-            rounded
-            :href="`https://docs.google.com/spreadsheets/d/${data.id}`"
-            :disabled="loading"
-            target="_blank"
-            ><v-icon>mdi-open-in-new</v-icon>
-            <v-tooltip activator="parent" location="left"
-              >Open in new tab</v-tooltip
-            >
+          <v-btn color="green-lighten-1" size="small" icon class="mx-2" rounded
+            :href="`https://docs.google.com/spreadsheets/d/${data.id}`" :disabled="loading"
+            target="_blank"><v-icon>mdi-open-in-new</v-icon>
+            <v-tooltip activator="parent" location="left">Open in new tab</v-tooltip>
           </v-btn>
-          <v-btn
-            color="red-lighten-2"
-            size="small"
-            icon
-            class="mx-2"
-            :disabled="loading"
-            rounded
-            @click="removeSheet(data.id)"
-            ><v-icon>mdi-stop</v-icon>
-            <v-tooltip activator="parent" location="left"
-              >Stop archiving, does not delete the spreadsheet
-              itself.</v-tooltip
-            >
+          <v-btn color="red-lighten-2" size="small" icon class="mx-2" :disabled="loading" rounded
+            @click="removeSheet(data.id)"><v-icon>mdi-stop</v-icon>
+            <v-tooltip activator="parent" location="left">Stop archiving, does not delete the spreadsheet
+              itself.</v-tooltip>
           </v-btn>
         </template>
         <template v-slot:item.name="{ item: data }">
           <strong :title="data.id">{{ data.name }}</strong>
         </template>
         <template v-slot:item.frequency="{ item: data }">
-          <v-chip
-            :color="
-              data.frequency == 'daily' ? 'teal-darken-3' : 'orange-darken-3'
-            "
-            class="bg-white"
-            prepend-icon="mdi-archive-clock-outline"
-            variant="outlined"
-          >
+          <v-chip :color="data.frequency == 'daily' ? 'teal-darken-3' : 'orange-darken-3'
+            " class="bg-white" prepend-icon="mdi-archive-clock-outline" variant="outlined">
             {{ data.frequency }}
           </v-chip>
+        </template>
+        <template v-slot:item.created_at="{ item }">
+          <time :datetime="item?.created_at" :title="$moment(item?.created_at).format(
+            `MMMM Do YYYY, k:mm:ss`
+          )
+            ">{{ $moment(item?.created_at).fromNow() }}</time>
+        </template>
+        <template v-slot:item.last_url_archived_at="{ item }">
+          <time :datetime="item?.last_url_archived_at" :title="$moment(item?.last_url_archived_at).format(
+            `MMMM Do YYYY, k:mm:ss`
+          )
+            ">{{ $moment(item?.last_url_archived_at).fromNow() }}</time>
         </template>
       </v-data-table>
     </v-card>
   </v-container>
 
-  <SnackBar
-    :message="snackbarMessage"
-    :show="snackbar"
-    :color="snackbarColor"
-    @update:show="snackbar = $event"
-  />
+  <SnackBar :message="snackbarMessage" :show="snackbar" :color="snackbarColor" @update:show="snackbar = $event" />
 </template>
 
 <script>
