@@ -8,8 +8,9 @@
       <v-data-table :headers="headers" item-key="name" no-data-text="No Active Sheets available" :items="items"
         :loading="loading" items-per-page="25" hover>
         <template v-slot:item.actions="{ item: data }">
-          <v-btn :disabled="!canArchiveNow(data.group_id) || loading" color="teal-lighten-1" size="small" icon
-            class="mx-2" rounded @click="archiveSheetNow(data.id)"><v-icon>mdi-archive-outline</v-icon>
+          <v-btn :disabled="!canArchiveNow(data.group_id) || loading || coolOffManualTrigger[data?.id]" :loading="coolOffManualTrigger[data?.id]"
+            color="teal-lighten-1" size="small" icon class="mx-2" rounded
+            @click="archiveSheetNow(data.id)"><v-icon>mdi-archive-outline</v-icon>
 
             <v-tooltip activator="parent" location="left">Archive Now!</v-tooltip>
           </v-btn>
@@ -66,6 +67,7 @@ export default {
       snackbar: false,
       snackbarMessage: "",
       snackbarColor: "red",
+      coolOffManualTrigger: {},
 
       loading: false,
 
@@ -105,6 +107,10 @@ export default {
     },
     archiveSheetNow(sheetId) {
       this.loading = true;
+      this.coolOffManualTrigger[sheetId] = true;
+      setTimeout(() => {
+        this.coolOffManualTrigger[sheetId] = false;
+      }, 30000);
       fetch(`${this.$store.state.API_ENDPOINT}/sheet/${sheetId}/archive`, {
         method: "POST",
         headers: {
