@@ -1,29 +1,8 @@
 import { createStore } from "vuex";
 import { gapi } from "@/gapi";
-import {
-  signOut,
-  GoogleAuthProvider,
-  signInWithCredential,
-  browserLocalPersistence,
-  setPersistence,
-} from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { firebaseAuth } from "@/firebase.js";
 
-function saveToLocalStorage(state) {
-  localStorage.setItem("user", JSON.stringify(state.user));
-  localStorage.setItem("access_token", state.access_token);
-}
-
-function loadFromLocalStorage() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const access_token = localStorage.getItem("access_token");
-  return { user, access_token };
-}
-
-function clearLocalStorage() {
-  localStorage.removeItem("user");
-  localStorage.removeItem("access_token");
-}
 
 async function waitForGapiAuth2() {
   return new Promise((resolve, _reject) => {
@@ -52,11 +31,9 @@ export default createStore({
   mutations: {
     setUser(state, user) {
       state.user = user;
-      saveToLocalStorage(state);
     },
     setUserActiveState(state, active) {
       state.user.active = active;
-      saveToLocalStorage(state);
     },
     setUserPermissions(state, permissions) {
       state.user.permissions = permissions;
@@ -64,7 +41,6 @@ export default createStore({
         (key) => key !== "all"
       );
       state.loadingUserState = false;
-      saveToLocalStorage(state);
     },
     setUserUsage(state, usage) {
       state.user.usage = usage;
@@ -74,49 +50,15 @@ export default createStore({
     },
     setLoadingUserState(state, loadingUserState) {
       state.loadingUserState = loadingUserState;
-      saveToLocalStorage(state);
     },
     setAccessToken(state, access_token) {
       state.access_token = access_token;
-      saveToLocalStorage(state);
     },
     setErrorMessage(state, errorMessage) {
       state.errorMessage = errorMessage;
     },
   },
   actions: {
-    async signin({ commit, dispatch }) {
-      commit("setLoadingUserState", true);
-      async function callback(tokenResponse) {
-        let access_token = tokenResponse.access_token;
-        commit("setAccessToken", access_token);
-        const credential = GoogleAuthProvider.credential(null, access_token);
-
-        // Set persistence before signing in
-        await setPersistence(firebaseAuth, browserLocalPersistence);
-
-        // Sign in with the provided credential
-        const response = await signInWithCredential(firebaseAuth, credential);
-
-        commit("setUser", response.user);
-        dispatch("checkActiveUser");
-        dispatch("checkUserPermissions");
-        dispatch("checkUserUsage");
-      }
-
-      commit("setUser", null);
-
-      const client = google.accounts.oauth2.initTokenClient({
-        client_id:
-          "406209235111-r1mpkvkfaqc2jg5iqbvffl2b0rf4clbo.apps.googleusercontent.com",
-        scope:
-          "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-        callback,
-      });
-
-      await client.requestAccessToken();
-    },
-
     async signout({ commit }) {
       try {
         const authInstance = await waitForGapiAuth2();
@@ -133,7 +75,6 @@ export default createStore({
         // clean user from store and local storage
         commit("setUser", null);
         commit("setSheets", []);
-        clearLocalStorage();
       } catch (error) {
         console.error("signOutUser (firebase/auth.js): ", error);
       } finally {
@@ -230,6 +171,7 @@ export default createStore({
         console.error("getSheets (firebase.js): ", error);
       }
     },
+
     async createSheet(
       { _state, dispatch, _commit },
       { name, service_account_email }
@@ -395,33 +337,5 @@ export default createStore({
   },
   modules: {},
   plugins: [
-    (store) => {
-      store.subscribe((mutation, state) => {
-        if (mutation.type === "setUser" || mutation.type === "setAccessToken") {
-          saveToLocalStorage(state);
-        }
-      });
-
-      const { user, access_token } = loadFromLocalStorage();
-      if (user && access_token) {
-        store.commit("setLoadingUserState", true);
-        store.commit("setUser", user);
-        store.commit("setAccessToken", access_token);
-        store.getters.isTokenExpired
-          .then((expired) => {
-            if (expired) {
-              store.dispatch("signout");
-            } else {
-              store.dispatch("checkActiveUser");
-              store.dispatch("checkUserPermissions");
-              store.dispatch("checkUserUsage");
-            }
-          })
-          .catch((error) => {
-            console.error("Error checking token expiration:", error);
-            store.dispatch("signout");
-          });
-      }
-    },
   ],
 });

@@ -15,27 +15,11 @@
               This tool can be used to archive digital content via single URL or
               Google Sheets, you can also search for archived content.
             </p>
-            <div class="text-center">
-              <v-btn
-                v-if="!user && !loadingUserState"
-                @click="$store.dispatch('signin')"
-                size="large"
-                >Sign In</v-btn
-              >
-            </div>
-            <v-container
-              v-if="loadingUserState"
-              class="pane"
-              style="text-align: center"
-            >
+            <FirebaseLogin v-if="!user" />
+            <v-container v-if="loadingUserState" class="pane" style="text-align: center">
               <v-row justify="center">
                 <v-col cols="12">
-                  <v-progress-circular
-                    color="teal"
-                    indeterminate
-                    :size="82"
-                    :width="7"
-                  ></v-progress-circular>
+                  <v-progress-circular color="teal" indeterminate :size="82" :width="7"></v-progress-circular>
                 </v-col>
                 <v-col cols="12">
                   <h4>loading...</h4>
@@ -50,8 +34,12 @@
 </template>
 
 <script>
+import FirebaseLogin from "@/components/FirebaseLogin.vue";
 export default {
   name: "WelcomeCard",
+  components: {
+    FirebaseLogin,
+  },
   props: {},
   computed: {
     user() {

@@ -12,7 +12,7 @@
     "@mdi/font": "^7.2.96",
     "core-js": "^3.8.3",
     "firebase": "^9.22.0",
-    "firebaseui": "^6.0.2",
+    "firebaseui": "^6.1.0",
     "gapi-script": "^1.2.0",
     "googleapis": "^134.0.0",
     "moment": "^2.30.1",

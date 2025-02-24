@@ -77,8 +77,6 @@
       >
     </span>
 
-    <v-btn v-if="!user" @click="$store.dispatch('signin')">Sign In</v-btn>
-
     <v-menu v-if="user?.active && smAndDown">
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props"></v-app-bar-nav-icon>
