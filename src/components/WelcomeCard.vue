@@ -4,7 +4,7 @@
       <v-col>
         <v-card>
           <v-card-text>
-            <v-card-title class="text-center">
+            <v-card-title class="text-center mb-4">
               Welcome to the Auto Archiver Setup Tool
             </v-card-title>
             <v-alert color="#f2d97c" icon="mdi-alert">
@@ -12,8 +12,21 @@
               <br />Do not use for mission critical or sensitive data.
             </v-alert>
             <p>
-              This tool can be used to archive digital content via single URL or
-              Google Sheets, you can also search for archived content.
+              Access to the tool has to be granted by Bellingcat's Auto Archiver team.
+
+              We only provide access to open source researchers, journalists, or other groups or individuals aligned
+              with Bellingcat's goals. Still, we can only provide a limited quota per user.
+            </p>
+            <p>
+              Do know that you can deploy
+              your own version of this tool by hosting the
+              <a href="https://github.com/bellingcat/auto-archiver-api">API</a> and
+              the
+              <a href="https://github.com/bellingcat/auto-archiver-setup-tool">UI</a>, all our code is free and open source under an MIT license.
+            </p>
+            <p>
+              You can always just run <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a>
+              locally via the command line to achieve similar results.
             </p>
             <FirebaseLogin v-if="!user" />
             <v-container v-if="loadingUserState" class="pane" style="text-align: center">
