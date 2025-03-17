@@ -1,4 +1,6 @@
 import { gapi } from "gapi-script";
+// import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+// import { firebaseAuth } from "@/firebase.js";
 
 gapi.load("client:auth2", async () => {
   gapi.client.init({

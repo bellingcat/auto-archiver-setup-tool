@@ -28,11 +28,27 @@
               You can always just run <a href="https://github.com/bellingcat/auto-archiver">Bellingcat's Auto Archiver</a>
               locally via the command line to achieve similar results.
             </p>
-            <FirebaseLogin v-if="!user" />
-            <v-container v-if="loadingUserState" class="pane" style="text-align: center">
+            <div class="text-center">
+              <v-btn
+                v-if="!user && !loadingUserState"
+                @click="$store.dispatch('signin')"
+                size="large"
+                >Sign In</v-btn
+              >
+            </div>
+            <v-container
+              v-if="loadingUserState"
+              class="pane"
+              style="text-align: center"
+            >
               <v-row justify="center">
                 <v-col cols="12">
-                  <v-progress-circular color="teal" indeterminate :size="82" :width="7"></v-progress-circular>
+                  <v-progress-circular
+                    color="teal"
+                    indeterminate
+                    :size="82"
+                    :width="7"
+                  ></v-progress-circular>
                 </v-col>
                 <v-col cols="12">
                   <h4>loading...</h4>
@@ -47,12 +63,8 @@
 </template>
 
 <script>
-import FirebaseLogin from "@/components/FirebaseLogin.vue";
 export default {
   name: "WelcomeCard",
-  components: {
-    FirebaseLogin,
-  },
   props: {},
   computed: {
     user() {
