@@ -345,6 +345,10 @@
       mass destruction, or missiles; in each case including any affiliation with
       others whatsoever who support the above such activities or causes.
     </p>
+    <h4>Law-enforcement, intelligence, and military use</h4>
+    <p>
+      Our Products must not be used for purposes related to law-enforcement, intelligence, or military (including private military contractors and security forces) activities.
+    </p>
     <h4>Unauthorised use of Bellingcat property</h4>
     <p>
       We prohibit the impersonation of Bellingcat, the representation of a
