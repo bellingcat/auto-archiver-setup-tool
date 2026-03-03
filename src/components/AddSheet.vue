@@ -294,6 +294,9 @@ export default {
             this.showSnackbar(`Sheet created successfully!`, "green");
             this.$store.dispatch("getSheets");
             this.$store.dispatch("checkUserUsage");
+            this.sheetName = "";
+            this.sheetUrlId = "";
+            this.group = "please select";
           } else {
             throw new Error(JSON.stringify(j));
           }
@@ -304,9 +307,6 @@ export default {
         })
         .finally(() => {
           this.loading = false;
-          this.sheetName = "";
-          this.sheetUrlId = "";
-          this.group = "please select";
         });
     },
     displayPermissionValue(value, extraWord) {
